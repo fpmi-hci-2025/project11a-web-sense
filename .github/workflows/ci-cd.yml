@@ -82,6 +82,8 @@ jobs:
         with:
           branch: gh-pages
           folder: dist
+          target-folder: ${{ github.ref == 'refs/heads/main' && '' || 'staging' }}
+          clean: true
           commit-message: "Deploy ${{ github.ref_name }} branch"
 
       - name: Create GitHub Release
