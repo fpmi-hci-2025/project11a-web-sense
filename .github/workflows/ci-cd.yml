@@ -66,3 +66,9 @@ jobs:
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Show deployment URLs
+        run: |
+          echo "Production URL: https://yuliaraitsyna.github.io/project11a-web-sense/"
+          echo "Staging URL:    https://yuliaraitsyna.github.io/project11a-web-sense/staging/"
+
