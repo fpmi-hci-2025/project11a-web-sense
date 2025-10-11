@@ -69,6 +69,6 @@ jobs:
 
       - name: Show deployment URLs
         run: |
-          echo "Production URL: https://yuliaraitsyna.github.io/project11a-web-sense/"
-          echo "Staging URL:    https://yuliaraitsyna.github.io/project11a-web-sense/staging/"
+          echo "Production URL: https://fpmi-hci-2025.github.io/project11a-web-sense/"
+          echo "Staging URL:    https://fpmi-hci-2025.github.io/project11a-web-sense/staging/"
 
