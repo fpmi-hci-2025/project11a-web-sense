@@ -1,4 +1,4 @@
-name: CI/CD - Vite + React + Jest + GitHub Pages
+name: CI/CD - Vite + React + Jest + GitHub Pages + Docker
 
 on:
   push:
@@ -41,7 +41,7 @@ jobs:
         uses: SonarSource/sonarcloud-github-action@v2
         with:
           args: >
-            -Dsonar.projectKey=project11a-web-sense
+            -Dsonar.projectKey=fpmi-hci-2025_project11a-web-sense
             -Dsonar.organization=fpmi-hci-2025
             -Dsonar.sources=src
             -Dsonar.tests=src
@@ -50,15 +50,29 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-      - name: Build React app
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build Docker image
         run: |
           if [ "${{ github.ref }}" == "refs/heads/main" ]; then
-            echo "Building production..."
-            VITE_PUBLIC_URL=/project11a-web-sense/ npm run build -- --mode production
+            echo "Building production image..."
+            docker build --target builder \
+              --build-arg VITE_BASE_URL=/project11a-web-sense/ \
+              -t web-sense-builder .
           else
-            echo "Building staging..."
-            VITE_PUBLIC_URL=/project11a-web-sense/staging/ npm run build -- --mode development
+            echo "Building staging image..."
+            docker build --target builder \
+              --build-arg VITE_BASE_URL=/project11a-web-sense/staging/ \
+              -t web-sense-builder .
           fi
+
+      - name: Extract dist from Docker builder
+        run: |
+          CONTAINER_ID=$(docker create web-sense-builder)
+          docker cp $CONTAINER_ID:/app/dist ./dist
+          docker rm $CONTAINER_ID
+          ls -la ./dist
 
       - name: Copy index.html to 404.html
         run: cp dist/index.html dist/404.html
@@ -85,6 +99,6 @@ jobs:
 
       - name: Show deployment URLs
         run: |
-          echo "Production URL: https://fpmi-hci-2025.github.io/project11a-web-sense/"
-          echo "Staging URL:    https://fpmi-hci-2025.github.io/project11a-web-sense/staging/"
-
+          echo "### Deployment Complete" >> $GITHUB_STEP_SUMMARY
+          echo "**Production URL:** [https://fpmi-hci-2025.github.io/project11a-web-sense/](https://fpmi-hci-2025.github.io/project11a-web-sense/)" >> $GITHUB_STEP_SUMMARY
+          echo "**Staging URL:** [https://fpmi-hci-2025.github.io/project11a-web-sense/staging/](https://fpmi-hci-2025.github.io/project11a-web-sense/staging/)" >> $GITHUB_STEP_SUMMARY
