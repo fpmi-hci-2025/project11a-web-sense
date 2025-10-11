@@ -2,6 +2,7 @@ import { Routes, Route } from 'react-router-dom';
 import type { AppRoute } from './types';
 import PrivateRoute from './PrivateRoute';
 import { routes } from './routes';
+import App from '../App';
 
 function renderRoutes(routeList: AppRoute[]) {
   return routeList.map((route) => {
@@ -23,7 +24,7 @@ export default function AppRoutes() {
   return (
     <Routes>
       {renderRoutes(routes)}
-      <Route index element={<div>Home</div>} />
+      <Route index element={<App />} />
     </Routes>
   );
 }

@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Sense</title>
     <script type="text/javascript">
+      if (!location.pathname.endsWith('/')) {
+        location.replace(location.pathname + '/' + location.search + location.hash);
+      }
       (function(l) {
         if (l.search[1] === '/' ) {
           var decoded = l.search.slice(1).split('&').map(function(s) { 
