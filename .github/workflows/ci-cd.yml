@@ -34,6 +34,22 @@ jobs:
       - name: Run Jest tests
         run: npm test -- --watchAll=false
 
+      - name: Run Jest coverage
+        run: npm run test:coverage
+
+      - name: Run SonarQube scan
+        uses: SonarSource/sonarcloud-github-action@v2
+        with:
+          args: >
+            -Dsonar.projectKey=project11a-web-sense
+            -Dsonar.organization=fpmi-hci-2025
+            -Dsonar.sources=src
+            -Dsonar.tests=src
+            -Dsonar.test.inclusions=**/*.test.ts,**/*.test.tsx
+            -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
       - name: Build React app
         run: |
           if [ "${{ github.ref }}" == "refs/heads/main" ]; then
