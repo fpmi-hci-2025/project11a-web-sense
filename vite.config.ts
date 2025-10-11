@@ -4,5 +4,5 @@ import react from '@vitejs/plugin-react';
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
-  base: '/project11a-web-sense',
+  base: process.env.VITE_PUBLIC_URL || '/project11a-web-sense',
 });
