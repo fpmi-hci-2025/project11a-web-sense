@@ -14,7 +14,8 @@
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist",
     "test": "jest --watchAll=false",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "jest --coverage",
+    "start": "react-scripts start"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",

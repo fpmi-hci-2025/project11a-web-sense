@@ -1,0 +1,68 @@
+name: CI/CD - Vite + React + Jest + GitHub Pages
+
+on:
+  push:
+    branches:
+      - development
+      - main
+  pull_request:
+    branches:
+      - development
+      - main
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  build-test-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Jest tests
+        run: npm test -- --watchAll=false
+
+      - name: Build React app
+        run: |
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            echo "Building production..."
+            VITE_PUBLIC_URL=/project11a-web-sense/ npm run build -- --mode production
+          else
+            echo "Building staging..."
+            VITE_PUBLIC_URL=/project11a-web-sense/staging/ npm run build -- --mode development
+          fi
+
+      - name: Copy index.html to 404.html
+        run: cp dist/index.html dist/404.html
+
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages
+          folder: dist
+          commit-message: "Deploy ${{ github.ref_name }} branch"
+
+      - name: Create GitHub Release
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        id: create_release
+        uses: actions/create-release@v1
+        with:
+          tag_name: v${{ github.run_number }}
+          release_name: Release v${{ github.run_number }}
+          body: Automated release from main branch
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

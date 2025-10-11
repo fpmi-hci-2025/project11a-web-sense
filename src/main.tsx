@@ -4,9 +4,14 @@ import { BrowserRouter } from 'react-router-dom';
 import AppRoutes from './routes/AppRoutes';
 import './index.css';
 
+const basename =
+  import.meta.env.MODE === 'production'
+    ? '/project11a-web-sense/'
+    : '/project11a-web-sense/staging/';
+
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <BrowserRouter basename="/project11a-web-sense/">
+    <BrowserRouter basename={basename}>
       <AppRoutes />
     </BrowserRouter>
   </React.StrictMode>,
