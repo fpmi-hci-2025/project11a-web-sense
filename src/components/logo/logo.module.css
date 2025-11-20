@@ -1,0 +1,36 @@
+.logo {
+  display: inline-block;
+  cursor: default;
+}
+
+.logo--clickable {
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.logo--clickable:hover {
+  opacity: 0.8;
+}
+
+.logo-text {
+  font-family: var(--logo-font-family) !important;
+  font-weight: var(--logo-font-weight) !important;
+  letter-spacing: var(--logo-letter-spacing) !important;
+  margin: 0 !important;
+  color: var(--mui-text-primary) !important;
+}
+
+.logo--small .logo-text {
+  font-size: var(--logo-font-size-small) !important;
+  line-height: var(--logo-line-height-small) !important;
+}
+
+.logo--medium .logo-text {
+  font-size: var(--logo-font-size-medium) !important;
+  line-height: var(--logo-line-height-medium) !important;
+}
+
+.logo--large .logo-text {
+  font-size: var(--logo-font-size-large) !important;
+  line-height: var(--logo-line-height-large) !important;
+}

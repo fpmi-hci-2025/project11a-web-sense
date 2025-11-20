@@ -1,0 +1,152 @@
+/* Sense Typography System */
+
+/* -------------------------------------- */
+/* Desktop Typography (from table)        */
+/* -------------------------------------- */
+@media (min-width: 768px) {
+  /* Heading 1 - 48/52 */
+  .sense-heading-1,
+  h1.sense-heading-1 {
+    font-size: 48px;
+    line-height: 52px;
+    font-weight: 700;
+    margin: 0;
+  }
+
+  /* Heading 2 - 40/48 */
+  .sense-heading-2,
+  h2.sense-heading-2 {
+    font-size: 40px;
+    line-height: 48px;
+    font-weight: 700;
+    margin: 0;
+  }
+
+  /* Heading 3 - 36/40 */
+  .sense-heading-3,
+  h3.sense-heading-3 {
+    font-size: 36px;
+    line-height: 40px;
+    font-weight: 700;
+    margin: 0;
+  }
+
+  /* Description - 24/28 */
+  .sense-description {
+    font-size: 24px;
+    line-height: 28px;
+    font-weight: 400;
+    margin: 0;
+  }
+
+  /* Body 1 - 20/24 */
+  .sense-body-1,
+  p.sense-body-1 {
+    font-size: 20px;
+    line-height: 24px;
+    font-weight: 400;
+    margin: 0;
+  }
+
+  /* Body 2 - 16/20 */
+  .sense-body-2,
+  p.sense-body-2 {
+    font-size: 16px;
+    line-height: 20px;
+    font-weight: 400;
+    margin: 0;
+  }
+
+  /* Caption - 12/16 */
+  .sense-caption {
+    font-size: 12px;
+    line-height: 16px;
+    font-weight: 400;
+    margin: 0;
+  }
+}
+
+/* -------------------------------------- */
+/* Mobile Typography (from table)         */
+/* -------------------------------------- */
+@media (max-width: 767px) {
+  /* Heading 1 - 40/44 */
+  .sense-heading-1,
+  h1.sense-heading-1 {
+    font-size: 40px;
+    line-height: 44px;
+    font-weight: 700;
+    margin: 0;
+  }
+
+  /* Heading 2 - 36/40 */
+  .sense-heading-2,
+  h2.sense-heading-2 {
+    font-size: 36px;
+    line-height: 40px;
+    font-weight: 700;
+    margin: 0;
+  }
+
+  /* Heading 3 - 30/34 */
+  .sense-heading-3,
+  h3.sense-heading-3 {
+    font-size: 30px;
+    line-height: 34px;
+    font-weight: 700;
+    margin: 0;
+  }
+
+  /* Description - 20/24 */
+  .sense-description {
+    font-size: 20px;
+    line-height: 24px;
+    font-weight: 400;
+    margin: 0;
+  }
+
+  /* Body 1 - 16/20 */
+  .sense-body-1,
+  p.sense-body-1 {
+    font-size: 16px;
+    line-height: 20px;
+    font-weight: 400;
+    margin: 0;
+  }
+
+  /* Body 2 - 12/16 */
+  .sense-body-2,
+  p.sense-body-2 {
+    font-size: 12px;
+    line-height: 16px;
+    font-weight: 400;
+    margin: 0;
+  }
+
+  /* Caption - 8/10 */
+  .sense-caption {
+    font-size: 8px;
+    line-height: 10px;
+    font-weight: 400;
+    margin: 0;
+  }
+}
+
+/* -------------------------------------- */
+/* Utility Classes                        */
+/* -------------------------------------- */
+.sense-text-bold {
+  font-weight: 700;
+}
+
+.sense-text-medium {
+  font-weight: 500;
+}
+
+.sense-text-regular {
+  font-weight: 400;
+}
+
+.sense-text-light {
+  font-weight: 300;
+}

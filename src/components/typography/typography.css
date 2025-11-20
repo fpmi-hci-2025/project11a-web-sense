@@ -1,0 +1,99 @@
+.typography-page {
+  padding: 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+  font-family: 'Nunito Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+.typography-page h1 {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 32px;
+}
+
+.typography-page h2 {
+  font-size: 24px;
+  font-weight: 600;
+  margin-top: 32px;
+  margin-bottom: 16px;
+}
+
+.typography-section {
+  margin-bottom: 24px;
+}
+
+.typography-section h1 {
+  font-size: 32px;
+  font-weight: 700;
+  margin: 8px 0;
+}
+
+.typography-section h2 {
+  font-size: 24px;
+  font-weight: 600;
+  margin: 8px 0;
+}
+
+.typography-section h3 {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 8px 0;
+}
+
+.typography-section h4 {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 8px 0;
+}
+
+.typography-section h5 {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 8px 0;
+}
+
+.typography-section h6 {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 8px 0;
+}
+
+.typography-section p {
+  margin: 8px 0;
+  line-height: 1.6;
+}
+
+.typography-section ul,
+.typography-section ol {
+  margin: 8px 0;
+  padding-left: 24px;
+}
+
+.typography-section li {
+  margin: 4px 0;
+}
+
+.text-xs {
+  font-size: 12px;
+}
+
+.text-sm {
+  font-size: 14px;
+}
+
+.text-base {
+  font-size: 16px;
+}
+
+.text-lg {
+  font-size: 18px;
+}
+
+.text-xl {
+  font-size: 20px;
+}
+
+.text-2xl {
+  font-size: 24px;
+}
+

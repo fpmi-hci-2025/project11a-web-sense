@@ -1,0 +1,10 @@
+.link {
+  all: unset;
+  
+  font-family: var(--logo-font-family) !important;
+  font-weight: var(--logo-font-weight) !important;
+  letter-spacing: var(--logo-letter-spacing) !important;
+  margin: 0 !important;
+  color: var(--mui-text-highlight) !important;
+  cursor: pointer;
+}
