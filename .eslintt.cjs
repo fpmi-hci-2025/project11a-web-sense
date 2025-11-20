@@ -19,6 +19,7 @@ module.exports = {
     'react/react-in-jsx-scope': 'off',
     '@typescript-eslint/explicit-function-return-type': 'off',
     'prettier/prettier': 'error',
+    "react-refresh/only-export-components": "off",
     'import/order': ['error', { 'newlines-between': 'always' }]
   },
   settings: {
