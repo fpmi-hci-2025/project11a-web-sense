@@ -1,68 +1,14 @@
 import { useState } from 'react';
 import type { Publication } from './types';
-import type { User } from '../auth/types';
+import type { Role } from '../auth/types';
 import type { Comment } from '../comment/types';
 import { API_BASE_URL } from '../constants';
 import type { FeedItem } from '../feed/types';
-
-// Mock comments data for development
-const mockComments: Comment[] = [
-  {
-    id: 'comment-1',
-    publicationId: '1',
-    parentId: null,
-    authorId: 'user-101',
-    text: 'This is a great publication! Really insightful content.',
-    createdAt: '2025-12-06T10:30:00Z',
-    likesCount: 5,
-  },
-  {
-    id: 'comment-2',
-    publicationId: '1',
-    parentId: null,
-    authorId: 'user-102',
-    text: 'I completely agree with your perspective. Well written!',
-    createdAt: '2025-12-06T11:15:00Z',
-    likesCount: 3,
-  },
-  {
-    id: 'comment-3',
-    publicationId: '2',
-    parentId: null,
-    authorId: 'user-103',
-    text: 'Interesting take on this topic. Thanks for sharing!',
-    createdAt: '2025-12-05T14:20:00Z',
-    likesCount: 2,
-  },
-];
-
-const mockPublication: Publication = {
-  id: '1',
-  authorId: 'mock-author-id',
-  type: 'article',
-  title: 'Mock Publication Title',
-  content: 'This is mock content for development purposes. The actual API call is commented out below.',
-  source: 'Mock Source',
-  publicationDate: new Date().toISOString(),
-  likesCount: 42,
-  commentsCount: 15,
-  savedCount: 8,
-  isLiked: false,
-  isSaved: false,
-  author: {
-    id: 'mock-author-id',
-    username: 'MockAuthor',
-    iconUrl: '',
-    role: 'Creator'
-  }
-};
+import { mapUserResponse } from '../auth/useAuth';
 
 const getAuthToken = (): string | null => localStorage.getItem('authToken');
 
-const request = async (
-  endpoint: string,
-  options: RequestInit = {}
-): Promise<any> => {
+const request = async (endpoint: string, options: RequestInit = {}) => {
   const token = getAuthToken();
   const headers = {
     'Content-Type': 'application/json',
@@ -83,7 +29,7 @@ const request = async (
   return res.json();
 };
 
-const getRole = (role: UserRole) => {
+const getRole = (role: Role) => {
   switch (role) {
     case 'creator':
       return 'Creator';
@@ -97,7 +43,7 @@ const getRole = (role: UserRole) => {
 };
 
 const mapPublicationResponseToPublication = (
-  response: FeedItem
+  response: FeedItem,
 ): Publication => ({
   id: response.id,
   authorId: response.author_id,
@@ -111,29 +57,88 @@ const mapPublicationResponseToPublication = (
   savedCount: response.saved_count || 0,
   isLiked: response.is_liked || false,
   isSaved: response.is_saved || false,
-  author: response.author ? {
-    id: response.author.id,
-    username: response.author.username,
-    iconUrl: response.author.icon_url,
-    role: getRole(response.author.role),
-  } : { id: '', username: '', iconUrl: '', role: 'User' },
+  author: response.author
+    ? {
+        id: response.author.id,
+        username: response.author.username,
+        iconUrl: response.author.icon_url,
+        role: getRole(response.author.role),
+      }
+    : { id: '', username: '', iconUrl: '', role: 'User' },
 });
+
+const fetchMediaUrl = async (mediaId: string): Promise<string> => {
+  console.log('Fetching media URL for mediaId:', mediaId);
+  const res = await request(`/media/${mediaId}/file`, {
+    method: 'GET',
+  });
+
+  return res.url;
+};
+
+const fetchAuthorData = async (userId: string) => {
+  const authorResponse = await request(`/profile/${userId}`, { method: 'GET' });
+  return mapUserResponse(authorResponse);
+};
+
+const enrichPublication = async (
+  publication: FeedItem,
+): Promise<Publication> => {
+  console.log('Enriching publication:', publication.id);
+  const parsedPublication = mapPublicationResponseToPublication(publication);
+
+  // Enrich author data
+  if (parsedPublication.authorId) {
+    try {
+      console.log('Fetching author data for:', parsedPublication.authorId);
+      const authorData = await fetchAuthorData(parsedPublication.authorId);
+      parsedPublication.author = authorData;
+    } catch (error) {
+      console.error(
+        `Failed to fetch author data for userId: ${parsedPublication.authorId}`,
+        error,
+      );
+    }
+  }
+
+  // Enrich media data
+  if (publication.media && publication.media[0]) {
+    try {
+      console.log('Enriching media for publication:', publication.id);
+      const mediaUrl = await fetchMediaUrl(publication.media[0].id);
+      return {
+        ...parsedPublication,
+        media: { url: mediaUrl },
+      };
+    } catch (error) {
+      console.error(
+        `Failed to fetch media for mediaId: ${publication.media[0].id}`,
+        error,
+      );
+    }
+  }
+
+  return parsedPublication;
+};
 
 export const usePublication = () => {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState(false);
 
-  const createPublication = async (data: { title: string; content: string }) => {
+  const createPublication = async (data: {
+    title: string;
+    content: string;
+  }) => {
     setLoading(true);
-    setError(null);
+    setError(false);
     try {
       const response: FeedItem = await request('/publication/create', {
         method: 'POST',
         body: JSON.stringify(data),
       });
-      return mapPublicationResponseToPublication(response);
-    } catch (err: any) {
-      setError(err.message);
+      return await enrichPublication(response);
+    } catch (err) {
+      setError(true);
       throw err;
     } finally {
       setLoading(false);
@@ -141,40 +146,40 @@ export const usePublication = () => {
   };
 
   const getPublication = async (id: string) => {
-    // setLoading(true);
-    // setError(null);
-    // try {
-    //   const response: FeedItem = await request(`/publication/${id}`, {
-    //     method: 'GET',
-    //   });
-    //   return mapPublicationResponseToPublication(response);
-    // } catch (err: any) {
-    //   setError(err.message);
-    //   throw err;
-    // } finally {
-    //   setLoading(false);
-    // }
-
-    // Mock publication data for development
-
-    // Mock response for development
-    return mockPublication;
+    setLoading(true);
+    setError(false);
+    try {
+      console.log('getPublication called for id:', id);
+      const response: FeedItem = await request(`/publication/${id}`, {
+        method: 'GET',
+      });
+      console.log('Got response, enriching publication...');
+      const enriched = await enrichPublication(response);
+      console.log('Publication enriched successfully');
+      return enriched;
+    } catch (err) {
+      console.error('Error in getPublication:', err);
+      setError(true);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
   };
 
   const updatePublication = async (
     id: string,
-    data: { title: string; content: string }
+    data: { title: string; content: string },
   ) => {
     setLoading(true);
-    setError(null);
+    setError(false);
     try {
       const response: FeedItem = await request(`/publication/${id}`, {
         method: 'PUT',
         body: JSON.stringify(data),
       });
-      return mapPublicationResponseToPublication(response);
-    } catch (err: any) {
-      setError(err.message);
+      return await enrichPublication(response);
+    } catch (err) {
+      setError(true);
       throw err;
     } finally {
       setLoading(false);
@@ -183,13 +188,13 @@ export const usePublication = () => {
 
   const deletePublication = async (id: string) => {
     setLoading(true);
-    setError(null);
+    setError(false);
     try {
       await request(`/publication/${id}`, {
         method: 'DELETE',
       });
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError(true);
       throw err;
     } finally {
       setLoading(false);
@@ -197,100 +202,57 @@ export const usePublication = () => {
   };
 
   const likePublication = async (id: string) => {
-    // setLoading(true);
-    // setError(null);
-    try {
-      const response: FeedItem = await request(`/publication/${id}/like`, {
-        method: 'POST',
-      });
-      return mapPublicationResponseToPublication(response);
-    } catch (err: any) {
-      // setError(err.message);
-      throw err;
-    } finally {
-      // setLoading(false);
-    }
+    await request(`/publication/${id}/like`, {
+      method: 'POST',
+    });
   };
 
   const getLikes = async (id: string) => {
-    // setLoading(true);
-    // setError(null);
-    try {
-      const likes: User[] = await request(`/publication/${id}/likes`, {
-        method: 'GET',
-      });
-      return likes;
-    } catch (err: any) {
-      // setError(err.message);
-      throw err;
-    } finally {
-      // setLoading(false);
-    }
+    await request(`/publication/${id}/likes`, {
+      method: 'GET',
+    });
   };
 
   const savePublication = async (id: string) => {
-    // setLoading(true);
-    // setError(null);
-    try {
-      const response: FeedItem = await request(`/publication/${id}/save`, {
-        method: 'POST',
-      });
-      return mapPublicationResponseToPublication(response);
-    } catch (err: any) {
-      // setError(err.message);
-      throw err;
-    } finally {
-      // setLoading(false);
-    }
+    await request(`/publication/${id}/save`, {
+      method: 'POST',
+    });
   };
 
   const getComments = async (id: string) => {
-    // setLoading(true);
-    // setError(null);
-    // try {
-    //   const comments: Comment[] = await request(`/publication/${id}/comments`, {
-    //     method: 'GET',
-    //   });
-    //   return comments;
-    // } catch (err: any) {
-    //   setError(err.message);
-    //   throw err;
-    // } finally {
-    //   setLoading(false);
-    // }
+    setLoading(true);
+    setError(false);
 
-    // Mock comments for development - return comments for the specific publication
-    return mockComments;
+    try {
+      const comments: Comment[] = await request(`/publication/${id}/comments`, {
+        method: 'GET',
+      });
+      return comments;
+    } catch (err) {
+      setError(true);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
   };
 
   const createComment = async (id: string, content: string) => {
-    // setLoading(true);
-    // setError(null);
-    // try {
-    //   const comment: Comment = await request(`/publication/${id}/comments`, {
-    //     method: 'POST',
-    //     body: JSON.stringify({ content }),
-    //   });
-    //   return comment;
-    // } catch (err: any) {
-    //   setError(err.message);
-    //   throw err;
-    // } finally {
-    //   setLoading(false);
-    // }
+    setLoading(true);
+    setError(false);
 
-    // Mock comment creation for development
-    const newComment: Comment = {
-      id: `comment-${Date.now()}`,
-      publicationId: id,
-      parentId: null,
-      authorId: 'mock-user-id', // Use the mock user ID from auth
-      text: content,
-      createdAt: new Date().toISOString(),
-      likesCount: 0,
-    };
+    try {
+      const comment: Comment = await request(`/publication/${id}/comments`, {
+        method: 'POST',
+        body: JSON.stringify({ content }),
+      });
 
-    return newComment;
+      return comment;
+    } catch (err) {
+      setError(true);
+      console.log('Error creating comment:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return {

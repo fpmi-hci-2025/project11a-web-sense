@@ -169,6 +169,13 @@
   position: relative;
 }
 
+.articleContainer:not(.creator):not(.expert):not(.user) {
+  background-color: transparent;
+  border-left: none;
+  padding: 0;
+  border-radius: 0;
+}
+
 .articleContainer.creator {
   background: linear-gradient(180deg, var(--sense-creator-gradient), transparent);
 }
@@ -186,6 +193,18 @@
   font-size: 16px;
   line-height: 1.6;
   color: var(--sense-text-button-color);
+}
+
+.fullArticleContent {
+  padding-left: 0;
+  font-size: 18px;
+  line-height: 1.7;
+}
+
+.fullPublicationContent {
+  max-height: none !important;
+  overflow: visible !important;
+  margin-bottom: 0;
 }
 
 @media (max-width: 400px) {
