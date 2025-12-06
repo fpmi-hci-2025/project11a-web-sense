@@ -1,4 +1,4 @@
-import { Alert, CircularProgress } from '@mui/material';
+import { useAuth } from '../../api/auth/useAuth';
 import { Footer } from '../../components/footer';
 import { Header } from '../../components/header';
 
@@ -6,26 +6,16 @@ import styles from './page-wrapper.module.css';
 
 interface PageWrapperProps {
   children: React.ReactNode | React.ReactNode[];
-  isLoading?: boolean;
-  isError?: boolean;
 }
 
-export const PageWrapper = ({ children, isLoading, isError }: PageWrapperProps) => {
+export const PageWrapper = ({ children }: PageWrapperProps) => {
+  const { user } = useAuth();
+
   return (
     <div>
-      <Header showAvatar={false} showLogo={true} showLoginButton={true} />
+      <Header showLogo={true} showAvatar={!!user} showLoginButton={!user} />
       <div className={styles.content}>
-        { 
-          isError && 
-          <Alert severity="error" className={styles.error}>
-              Something went wrong
-          </Alert>
-        }
-        { isLoading ? 
-          <div className={styles.loaderWrapper}>
-            <CircularProgress size={90} color='inherit'/>
-          </div>
-        : children }
+        { children }
       </div>
       <Footer />
     </div>

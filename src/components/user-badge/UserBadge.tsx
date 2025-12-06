@@ -1,21 +1,20 @@
 import { Chip } from '@mui/material';
 import styles from './userBadge.module.css';
-
-type UserRole = 'Creator' | 'User' | 'Expert';
+import type { Role } from '../../api/auth/types';
 
 interface UserBadgeProps {
-  role: UserRole;
+  role: Role;
 }
 
 export const UserBadge = ({ role }: UserBadgeProps) => {
   const roleClass =
-    role === 'Creator'
+    role === 'creator'
       ? styles.creator
-      : role === 'Expert'
+      : role === 'expert'
       ? styles.expert
       : styles.user;
 
-  const getRoleLabel = (role: UserRole): string => {
+  const getRoleLabel = (role: Role): string => {
     return role.charAt(0).toUpperCase() + role.slice(1);
   };
 

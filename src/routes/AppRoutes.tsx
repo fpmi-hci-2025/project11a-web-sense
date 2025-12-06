@@ -3,6 +3,10 @@ import type { AppRoute } from './types';
 import PrivateRoute from './PrivateRoute';
 import { routes } from './routes';
 import { HomePage } from '../pages/home-page/home-page';
+import { useAuth } from '../api/auth/useAuth';
+import { CircularProgress } from '@mui/material';
+
+import styles from './route.module.css';
 
 function renderRoutes(routeList: AppRoute[]) {
   return routeList.map((route) => {
@@ -21,6 +25,16 @@ function renderRoutes(routeList: AppRoute[]) {
 }
 
 export default function AppRoutes() {
+  const { loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className={styles.loaderWrapper}>
+        <CircularProgress size={90} color="inherit" />
+      </div>
+    )
+  }
+
   return (
     <Routes>
       {renderRoutes(routes)}

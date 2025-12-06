@@ -1,10 +1,8 @@
 import { useState } from 'react';
-import type {
-  Publication,
-  PublicationResponse,
-} from '../publication/types';
+import type { Publication } from '../publication/types';
 import type { User, UserResponse } from '../auth/types';
 import { API_BASE_URL } from '../constants'; 
+import type { FeedItem } from '../feed/types';
 
 const getAuthToken = (): string | null => localStorage.getItem('authToken');
 
@@ -22,7 +20,7 @@ export const mapUser = (response: UserResponse): User => ({
 const request = async (
   endpoint: string,
   options: RequestInit = {}
-): Promise<any> => {
+) => {
   const token = getAuthToken();
   const headers = {
     'Content-Type': 'application/json',
@@ -43,36 +41,35 @@ const request = async (
   return res.json();
 };
 
-const mapPublication = (p: PublicationResponse): Publication => ({
+const mapPublication = (p: FeedItem): Publication => ({
   id: p.id,
-  authorId: p.authorId,
+  authorId: p.author_id,
   type: p.type,
   title: p.title,
   content: p.content,
   source: p.source,
-  publicationDate: p.publicationDate,
-  likesCount: p.likes_count,
-  commentsCount: p.comments_count,
-  savedCount: p.saved_count,
-  isLiked: p.is_liked,
-  isSaved: p.is_saved,
+  publicationDate: p.publication_date,
+  likesCount: p.likes_count || 0,
+  commentsCount: p.comments_count || 0,
+  savedCount: p.saved_count || 0,
+  isLiked: p.is_liked || false,
+  isSaved: p.is_saved || false,
 });
 
 export const useSearch = () => {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState(false);
 
   const searchPublications = async (query: string) => {
     setLoading(true);
-    setError(null);
+    setError(false);
     try {
-      const response: PublicationResponse[] = await request(`/search?q=${encodeURIComponent(query)}`, {
+      const response: FeedItem[] = await request(`/search?q=${encodeURIComponent(query)}`, {
         method: 'GET',
       });
       return response.map(mapPublication);
-    } catch (err: any) {
-      setError(err.message);
-      throw err;
+    } catch (err) {
+      setError(true);
     } finally {
       setLoading(false);
     }
@@ -80,15 +77,14 @@ export const useSearch = () => {
 
   const searchUsers = async (query: string) => {
     setLoading(true);
-    setError(null);
+    setError(false);
     try {
       const response: UserResponse[] = await request(`/search/users?q=${encodeURIComponent(query)}`, {
         method: 'GET',
       });
       return response.map(mapUser);
-    } catch (err: any) {
-      setError(err.message);
-      throw err;
+    } catch (err) {
+      setError(true);
     } finally {
       setLoading(false);
     }
@@ -96,14 +92,13 @@ export const useSearch = () => {
 
   const warmupSearchIndex = async () => {
     setLoading(true);
-    setError(null);
+    setError(false);
     try {
       await request('/search/warmup', {
         method: 'POST',
       });
-    } catch (err: any) {
-      setError(err.message);
-      throw err;
+    } catch (err) {
+      setError(true);
     } finally {
       setLoading(false);
     }

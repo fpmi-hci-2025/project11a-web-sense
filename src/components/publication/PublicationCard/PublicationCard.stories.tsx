@@ -91,6 +91,7 @@ export const ExpertRole: Story = {
       likesCount: 43,
       author: {
         ...mockPublication.author,
+        id: mockPublication.authorId,
         role: 'Expert',
       }
     },
@@ -107,6 +108,7 @@ export const UserRole: Story = {
       likesCount: 43,
       author: {
         ...mockPublication.author,
+        id: mockPublication.authorId,
         role: 'User',
       }
     },

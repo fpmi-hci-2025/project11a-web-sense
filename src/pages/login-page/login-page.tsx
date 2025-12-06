@@ -4,42 +4,35 @@ import { TextField } from '@mui/material';
 import { Button } from '../../components/button';
 import { useAuth } from '../../api/auth/useAuth';
 import styles from './login-page.module.css';
-import { Header } from '../../components/header';
-import { Footer } from '../../components/footer';
 import { PageWrapper } from '../page-wrapper/page-wrapper';
 
 export const LoginPage = () => {
   const navigate = useNavigate();
-  const { login, loading } = useAuth();
-  const [email, setEmail] = useState('');
+  const { login: loginUser, loading } = useAuth();
+  const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const [emailError, setEmailError] = useState<string | null>(null);
+  const [loginError, setLoginError] = useState<string | null>(null);
   const [passwordError, setPasswordError] = useState<string | null>(null);
-
-  const validateEmail = (email: string): boolean => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
 
   const validateForm = (): boolean => {
     let isValid = true;
-    setEmailError(null);
+    setLoginError(null);
     setPasswordError(null);
 
-    if (!email.trim()) {
-      setEmailError('Email обязателен');
+    if (!login.trim()) {
+      setLoginError('Login is required');
       isValid = false;
-    } else if (!validateEmail(email)) {
-      setEmailError('Некорректный email');
+    } else if (login.length < 5) {
+      setLoginError('Incorrect login');
       isValid = false;
     }
 
     if (!password.trim()) {
-      setPasswordError('Пароль обязателен');
+      setPasswordError('Password is required');
       isValid = false;
     } else if (password.length < 6) {
-      setPasswordError('Пароль должен быть не менее 6 символов');
+      setPasswordError('Password must be at least 6 characters');
       isValid = false;
     }
 
@@ -55,10 +48,10 @@ export const LoginPage = () => {
     }
 
     try {
-      await login(email, password);
+      await loginUser(login, password);
       navigate('/');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Ошибка входа');
+      setError(err instanceof Error ? err.message : 'Login failed');
     }
   };
 
@@ -69,16 +62,16 @@ export const LoginPage = () => {
         <form onSubmit={handleSubmit} className={styles.form}>
           <TextField
             className={styles.textField}
-            label="Email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            error={!!emailError}
-            helperText={emailError}
+            label="Login"
+            type="text"
+            value={login}
+            onChange={(e) => setLogin(e.target.value)}
+            error={!!loginError}
+            helperText={loginError}
             fullWidth
             margin="normal"
             disabled={loading}
-            autoComplete="email"
+            autoComplete="username"
           />
           <TextField
             className={styles.textField}

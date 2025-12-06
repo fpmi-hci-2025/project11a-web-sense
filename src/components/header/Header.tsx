@@ -34,7 +34,6 @@ export const Header = ({
   logoSize = 'medium',
 }: HeaderProps) => {
   const navigate = useNavigate();
-  const { user } = useAuth();
 
   const handleLogoClick = () => {
     if (onLogoClick) {
@@ -56,9 +55,6 @@ export const Header = ({
     }
   };
 
-  const finalAvatarSrc = avatarSrc || user?.iconUrl;
-  const finalAvatarInitials = avatarInitials || (user?.username ? user.username.charAt(0).toUpperCase() : undefined);
-
   return (
     <header className={clsx(styles['sense-header'], className)}>
       <div className={styles['sense-header-container']}>
@@ -70,7 +66,7 @@ export const Header = ({
           />
         )}
         <div className={styles['sense-header-actions']}>
-          {showLoginButton && !user && (
+          {showLoginButton && (
             <Button
               label="Login"
               variant="filled"
@@ -79,9 +75,9 @@ export const Header = ({
           )}
           {showAvatar && (
             <Avatar
-              src={finalAvatarSrc}
+              src={avatarSrc}
               alt={avatarAlt}
-              initials={finalAvatarInitials}
+              initials={avatarInitials}
               size={avatarSize}
               onClick={handleAvatarClick}
               clickable={true}
