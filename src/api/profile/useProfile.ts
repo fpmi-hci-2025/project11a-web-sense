@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import type { Profile, ProfileResponse, ProfileStats } from './types';
-
-const API_BASE_URL = 'https://your-api.com';
+import { API_BASE_URL } from '../constants';
 
 const getAuthToken = (): string | null => localStorage.getItem('authToken');
 

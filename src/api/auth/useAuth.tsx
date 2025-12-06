@@ -1,7 +1,6 @@
 import { useState, useEffect, useContext, createContext, type ReactNode } from 'react';
 import type { AuthContextType, User, UserResponse } from './types';
-
-const API_BASE_URL = 'api-url';
+import { API_BASE_URL } from '../constants';
 const LOGIN_ENDPOINT = '/auth/login';
 const REGISTER_ENDPOINT = '/auth/register';
 const CHECK_ENDPOINT = '/auth/check';
@@ -14,54 +13,76 @@ const setAuthToken = (token: string): void => localStorage.setItem('authToken', 
 const clearAuthToken = (): void => localStorage.removeItem('authToken');
 
 const apiLogin = async (email: string, password: string): Promise<UserResponse> => {
-  const res = await fetch(`${API_BASE_URL}${LOGIN_ENDPOINT}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password }),
-  });
+  setTimeout(() => {}, 2000);
+  // const res = await fetch(`${API_BASE_URL}${LOGIN_ENDPOINT}`, {
+  //   method: 'POST',
+  //   headers: { 'Content-Type': 'application/json' },
+  //   body: JSON.stringify({ email, password }),
+  // });
 
-  if (!res.ok) {
-    const errorData = await res.json().catch(() => ({}));
-    throw new Error(errorData.message || 'Login failed');
-  }
+  // if (!res.ok) {
+  //   const errorData = await res.json().catch(() => ({}));
+  //   throw new Error(errorData.message || 'Login failed');
+  // }
 
-  const data = await res.json();
-  setAuthToken(data.token);
-  return data.user;
+  // const data = await res.json();
+  // setAuthToken(data.token);
+  // return data.user;
+
+  return mockUser;
 };
 
-const apiRegister = async (email: string, password: string): Promise<UserResponse> => {
-  const res = await fetch(`${API_BASE_URL}${REGISTER_ENDPOINT}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password }),
-  });
+const apiRegister = async (username: string, email: string, password: string): Promise<UserResponse> => {
+  setTimeout(() => {}, 2000);
+  // const res = await fetch(`${API_BASE_URL}${REGISTER_ENDPOINT}`, {
+  //   method: 'POST',
+  //   headers: { 'Content-Type': 'application/json' },
+  //   body: JSON.stringify({ username, email, password }),
+  // });
 
-  if (!res.ok) {
-    const errorData = await res.json().catch(() => ({}));
-    throw new Error(errorData.message || 'Registration failed');
-  }
+  // if (!res.ok) {
+  //   const errorData = await res.json().catch(() => ({}));
+  //   throw new Error(errorData.message || 'Registration failed');
+  // }
 
-  const data = await res.json();
-  setAuthToken(data.token);
-  return data.user;
+  // const data = await res.json();
+  // setAuthToken(data.token);
+  // return data.user;
+
+  return mockUser;
+};
+
+// Mock user for development
+const mockUser: UserResponse = {
+  id: 'mock-user-id',
+  username: 'MockUser',
+  email: 'mock@example.com',
+  phone: '+1234567890',
+  icon_url: '',
+  registered_at: new Date().toISOString(),
+  description: 'Mock user for development',
+  role: 'User',
+  statistic: undefined
 };
 
 const apiCheckAuth = async (): Promise<UserResponse | null> => {
-  const token = getAuthToken();
-  if (!token) return null;
+  setTimeout(() => {}, 2000);
+  // const token = getAuthToken();
+  // if (!token) return null;
 
-  const res = await fetch(`${API_BASE_URL}${CHECK_ENDPOINT}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  // const res = await fetch(`${API_BASE_URL}${CHECK_ENDPOINT}`, {
+  //   headers: { Authorization: `Bearer ${token}` },
+  // });
 
-  if (!res.ok) {
-    clearAuthToken();
-    return null;
-  }
+  // if (!res.ok) {
+  //   clearAuthToken();
+  //   return null;
+  // }
 
-  const data = await res.json();
-  return data.user;
+  // const data = await res.json();
+  // return data.user;
+
+  return mockUser;
 };
 
 const apiLogout = async (): Promise<void> => {
@@ -99,15 +120,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
 
       setUser(user);
+    } catch (error) {
+      setLoading(false);
+      throw error;
     } finally {
       setLoading(false);
     }
   };
 
-  const register = async (email: string, password: string) => {
+  const register = async (username: string, email: string, password: string) => {
     setLoading(true);
     try {
-      const userData = await apiRegister(email, password);
+      const userData = await apiRegister(username, email, password);
 
       const user: User = {
         id: userData.id,
@@ -121,6 +145,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
 
       setUser(user);
+    } catch (error) {
+      setLoading(false);
+      throw error;
     } finally {
       setLoading(false);
     }
