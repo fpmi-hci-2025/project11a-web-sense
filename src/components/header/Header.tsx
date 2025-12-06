@@ -4,7 +4,6 @@ import styles from './header.module.css';
 import { Logo } from '../logo';
 import clsx from 'clsx';
 import { Button } from '../button';
-import { useAuth } from '../../api/auth/useAuth';
 
 export interface HeaderProps {
   avatarSrc?: string;
@@ -59,19 +58,11 @@ export const Header = ({
     <header className={clsx(styles['sense-header'], className)}>
       <div className={styles['sense-header-container']}>
         {showLogo && (
-          <Logo
-            size={logoSize}
-            onClick={handleLogoClick}
-            clickable={true}
-          />
+          <Logo size={logoSize} onClick={handleLogoClick} clickable={true} />
         )}
         <div className={styles['sense-header-actions']}>
           {showLoginButton && (
-            <Button
-              label="Login"
-              variant="filled"
-              onClick={handleLoginClick}
-            />
+            <Button label="Login" variant="filled" onClick={handleLoginClick} />
           )}
           {showAvatar && (
             <Avatar
