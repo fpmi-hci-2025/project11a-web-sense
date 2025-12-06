@@ -22,6 +22,9 @@ interface PublicationCardProps {
 
 export const PublicationCard = ({
   publication,
+  isFeed = true,
+  isClickable = true,
+  showActions = true,
 }: PublicationCardProps) => {
   const navigate = useNavigate();
 
@@ -33,15 +36,25 @@ export const PublicationCard = ({
     publication.author?.role === 'creator'
       ? styles.creator
       : publication.author?.role === 'expert'
-      ? styles.expert
-      : styles.user;
+        ? styles.expert
+        : styles.user;
 
-  const handleClickNaviagate = (e: React.MouseEvent) => {
-    navigate(`/publication/${publication.id}`);
+  const handleClickNaviagate = () => {
+    navigate(`/publication/${publication.id}`, {
+      state: { publication },
+    });
   };
 
+  const cardClassName = isFeed
+    ? styles.publicationCard
+    : `${styles.publicationCard} ${styles.fullView}`;
+
   return (
-    <article className={styles.publicationCard} onClick={handleClickNaviagate}>
+    <article
+      className={cardClassName}
+      onClick={isClickable ? handleClickNaviagate : undefined}
+      style={!isClickable ? { cursor: 'default' } : {}}
+    >
       <div className={styles.publicationHeader}>
         <div className={styles.publicationHeaderLeft}>
           {publication.author && (
@@ -54,7 +67,9 @@ export const PublicationCard = ({
                 clickable={true}
                 onClick={() => navigate(`/profile/${publication.author?.id}`)}
               />
-              <Typography className={styles.authorName} variant='body2'>{publication.author.username}</Typography>
+              <Typography className={styles.authorName} variant="body2">
+                {publication.author.username}
+              </Typography>
             </div>
           )}
         </div>
@@ -66,11 +81,15 @@ export const PublicationCard = ({
 
       {isQuote && (
         <>
-          <div className={`${styles.quoteContainer} ${roleClass}`}>
+          <div
+            className={`${styles.quoteContainer} ${isFeed ? roleClass : ''}`}
+          >
             <FormatQuoteIcon className={styles.quoteIcon} />
             <div className={styles.quoteContent}>{publication.content}</div>
           </div>
-          <Typography variant='body2' className={styles.publicationSource}>— {publication.source}</Typography>
+          <Typography variant="body2" className={styles.publicationSource}>
+            — {publication.source}
+          </Typography>
         </>
       )}
 
@@ -87,28 +106,44 @@ export const PublicationCard = ({
       {isArticle && (
         <>
           {publication.title && (
-            <Typography variant='h4' className={styles.articleTitle}>{publication.title}</Typography>
+            <Typography
+              variant={isFeed ? 'h4' : 'h3'}
+              className={styles.articleTitle}
+            >
+              {publication.title}
+            </Typography>
           )}
           {publication.content && (
-            <div className={`${styles.articleContainer} ${roleClass}`}>
-              <div className={styles.articleContent}>
-                <Typography variant='body1' className={styles.publicationContent}>{publication.content}</Typography>
+            <div
+              className={`${styles.articleContainer} ${isFeed ? roleClass : ''}`}
+            >
+              <div
+                className={`${styles.articleContent} ${isFeed ? '' : styles.fullArticleContent}`}
+              >
+                <Typography
+                  variant="body1"
+                  className={`${styles.publicationContent} ${isFeed ? '' : styles.fullPublicationContent}`}
+                >
+                  {publication.content}
+                </Typography>
               </div>
             </div>
           )}
         </>
       )}
 
-      <PublicationActions
-        publicationId={publication.id}
-        isLiked={publication.isLiked}
-        isSaved={publication.isSaved}
-        likesCount={publication.likesCount}
-        commentsCount={publication.commentsCount}
-        savedCount={publication.savedCount}
-        showComments={isPost || isArticle}
-        onCommentClick={() => navigate(`/publication/${publication.id}`)}
-      />
+      {showActions && (
+        <PublicationActions
+          publicationId={publication.id}
+          isLiked={publication.isLiked}
+          isSaved={publication.isSaved}
+          likesCount={publication.likesCount}
+          commentsCount={publication.commentsCount}
+          savedCount={publication.savedCount}
+          showComments={isPost || isArticle}
+          onCommentClick={() => navigate(`/publication/${publication.id}`)}
+        />
+      )}
     </article>
   );
 };

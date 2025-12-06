@@ -30,6 +30,9 @@ export const Avatar = ({
 
   const Wrapper = link ? 'a' : 'span';
 
+  const shouldShowInitials = !src && initials;
+  const shouldShowDefault = !src && !initials;
+
   return (
     <Wrapper
       href={link}
@@ -44,9 +47,10 @@ export const Avatar = ({
           width: avatarSize,
           height: avatarSize,
           fontSize: avatarSize / 2.5,
+          bgcolor: shouldShowDefault ? 'grey.400' : undefined,
         }}
       >
-        {!src && initials && initials.toUpperCase()}
+        {shouldShowInitials && initials!.toUpperCase()}
       </MuiAvatar>
     </Wrapper>
   );
