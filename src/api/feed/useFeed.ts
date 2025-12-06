@@ -1,125 +1,47 @@
 import { useState } from 'react';
-import type { FeedItem, UserRole } from './types';
+import type { Feed, FeedItem, FeedResponse } from './types';
 import { API_BASE_URL } from '../constants';
 import type { Publication } from '../publication/types';
-
-const mockPublications: Publication[] = [
-  {
-    id: '1',
-    authorId: '101',
-    type: 'post',
-    title: 'Mock Post Title',
-    content: 'This is a mock post content.',
-    publicationDate: '2025-12-05T10:00:00Z',
-    likesCount: 10,
-    commentsCount: 5,
-    savedCount: 2,
-    isLiked: false,
-    isSaved: false,
-    author: {
-      id: '101',
-      username: 'mockuser',
-      role: 'User',
-      iconUrl: '',
-    },
-    media: { url: 'https://st3.depositphotos.com/1005145/15351/i/450/depositphotos_153516954-stock-photo-summer-landscape-with-flowers-in.jpg' },
-  },
-  {
-    id: '2',
-    authorId: '102',
-    type: 'quote',
-    content: 'This is a mock quote.',
-    source: 'https://example.com',
-    publicationDate: '2025-12-04T15:00:00Z',
-    likesCount: 20,
-    commentsCount: 10,
-    savedCount: 5,
-    isLiked: true,
-    isSaved: true,
-    author: {
-      id: '102',
-      username: 'mockcreator',
-      role: 'Expert',
-      iconUrl: '',
-    },
-    media: undefined,
-  },
-  {
-    id: '3',
-    authorId: '102',
-    type: 'article',
-    title: 'Mock Article Title',
-    content: 'Such a long article content to demonstrate the article type in the feed. It can span multiple lines and include various sections to provide in-depth information on a topic.',
-    source: 'https://example.com',
-    publicationDate: '2025-12-04T15:00:00Z',
-    likesCount: 20,
-    commentsCount: 10,
-    savedCount: 5,
-    isLiked: true,
-    isSaved: true,
-    author: {
-      id: '102',
-      username: 'mockcreator',
-      role: 'Creator',
-      iconUrl: '',
-    },
-    media: undefined,
-  },
-];
+import { mapUserResponse } from '../auth/useAuth';
 
 const getAuthToken = (): string | null => localStorage.getItem('authToken');
 
 const request = async (
   endpoint: string,
   options: RequestInit = {}
-): Promise<any> => {
-  // Mock request function for development
-  // const token = getAuthToken();
-  // const headers = {
-  //   'Content-Type': 'application/json',
-  //   ...(token ? { Authorization: `Bearer ${token}` } : {}),
-  //   ...options.headers,
-  // };
+) => {
+  const token = getAuthToken();
+  const headers = {
+    'Content-Type': 'application/json',
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    ...options.headers,
+  };
 
-  // const res = await fetch(`${API_BASE_URL}${endpoint}`, {
-  //   ...options,
-  //   headers,
-  // });
+  const res = await fetch(`${API_BASE_URL}${endpoint}`, {
+    ...options,
+    headers,
+  });
 
-  // if (!res.ok) {
-  //   const errorData = await res.json().catch(() => ({}));
-  //   throw new Error(errorData.message || `HTTP ${res.status}`);
-  // }
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.message || `HTTP ${res.status}`);
+  }
 
-  // return res.json();
-
-  // Return mock data for development
-  return {};
+  return res.json();
 };
 
 const fetchMediaUrl = async (mediaId: string): Promise<string> => {
-  // Mock media URL fetching for development
-  // const res = await request(`/media/${mediaId}/file`, {
-  //   method: 'GET',
-  // });
+  console.log('Fetching media URL for mediaId:', mediaId);
+  const res = await request(`/media/${mediaId}/file`, {
+    method: 'GET',
+  });
 
-  // return res.url;
-
-  // Return mock media URL for development
-  return `https://picsum.photos/400/300?random=${mediaId}`;
+  return res.url;
 };
 
-const getRole = (role: UserRole) => {
-  switch (role) {
-    case 'creator':
-      return 'Creator';
-    case 'user':
-      return 'User';
-    case 'expert':
-      return 'Expert';
-    default:
-      return 'User';
-  }
+const fetchAuthorData = async (userId: string) => {
+  const authorResponse = await request(`/profile/${userId}`, { method: 'GET' });
+  return mapUserResponse(authorResponse);
 };
 
 const parsePublication = (response: FeedItem): Publication => ({
@@ -135,105 +57,123 @@ const parsePublication = (response: FeedItem): Publication => ({
   savedCount: response.saved_count || 0,
   isLiked: response.is_liked || false,
   isSaved: response.is_saved || false,
-  author: response.author ? {
-    id: response.author.id,
-    username: response.author.username,
-    iconUrl: response.author.icon_url,
-    role: getRole(response.author.role),
-  } : { id: '', username: '', iconUrl: '', role: 'User' },
+  author: response.author ? mapUserResponse(response.author) : undefined,
 });
 
-const enrichPublication = async (publication: FeedItem) => {
-  if (publication.media && publication.media[0]) {
-    const mediaUrl = await fetchMediaUrl(publication.media[0].id);
-    const parsedPublication = parsePublication(publication);
-    return {
-      ...parsedPublication,
-      media: { url: mediaUrl },
-    };
-  }
-
+const enrichFeedItem = async (publication: FeedItem) => {
   const parsedPublication = parsePublication(publication);
 
-  return {
-    ...parsedPublication,
-  };
+  if (parsedPublication.authorId) {
+    try {
+      const authorData = await fetchAuthorData(parsedPublication.authorId);
+      parsedPublication.author = authorData;
+    } catch (error) {
+      console.error(`Failed to fetch author data for userId: ${parsedPublication.authorId}`, error);
+    }
+  }
+
+  if (publication.media && publication.media[0]) {
+    try {
+      const mediaUrl = await fetchMediaUrl(publication.media[0].id);
+      return {
+        ...parsedPublication,
+        media: { url: mediaUrl },
+      };
+    } catch (error) {
+      console.error(`Failed to fetch media for mediaId: ${publication.media[0].id}`, error);
+    }
+  }
+
+  return parsedPublication;
 };
 
-const fetchFeedWithMedia = async (endpoint: string) => {
-  // Mock feed fetching for development
-  // const feedResponse: FeedResponse = await request(endpoint, { method: 'GET' });
-
-  // const enrichedPublications = await Promise.all(
-  //   feedResponse.items.map((publication: FeedItem) => enrichPublication(publication))
-  // );
-
-  // return {
-  //   ...feedResponse,
-  //   items: enrichedPublications,
-  // };
-
-  // Return mock feed data for development
-  return {
-    items: mockPublications,
-    total: mockPublications.length,
-    limit: 10,
-    offset: 0,
-  };
+const enrichFeed = async (feed: FeedResponse): Promise<Feed> => {
+  const items = await Promise.all(feed.items.map(enrichFeedItem));
+  return { ...feed, items };
 };
 
 export const useFeed = () => {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState(false);
 
-  const getFeed = async () => {
+  const getFeed = async (limit?: number, offset?: number): Promise<Feed> => {
     setLoading(true);
-    setError(null);
-
+    setError(false);
     try {
-      const response = await fetchFeedWithMedia('/feed');
-      return response;
-    } catch (err: any) {
-      setError(err.message);
+      const params = new URLSearchParams();
+      if (limit !== undefined) params.append('limit', limit.toString());
+      if (offset !== undefined) params.append('offset', offset.toString());
+
+      const queryString = params.toString();
+      const endpoint = queryString ? `/feed?${queryString}` : '/feed';
+
+      const feedResponse = await request(endpoint, { method: 'GET' });
+      return enrichFeed(feedResponse);
+    } catch (err) {
+      setError(true);
       throw err;
     } finally {
       setLoading(false);
     }
   };
 
-  const getMyPublications = async () => {
+  const getMyPublications = async (limit?: number, offset?: number): Promise<Feed> => {
     setLoading(true);
-    setError(null);
+    setError(false);
     try {
-      return await fetchFeedWithMedia('/feed/me');
-    } catch (err: any) {
-      setError(err.message);
+      const params = new URLSearchParams();
+      if (limit !== undefined) params.append('limit', limit.toString());
+      if (offset !== undefined) params.append('offset', offset.toString());
+
+      const queryString = params.toString();
+      const endpoint = queryString ? `/feed/me?${queryString}` : '/feed/me';
+
+      const response = await request(endpoint, { method: 'GET' });
+      return enrichFeed(response);
+    } catch (err) {
+      setError(true);
       throw err;
     } finally {
       setLoading(false);
     }
   };
 
-  const getSavedPublications = async () => {
+  const getSavedPublications = async (limit?: number, offset?: number): Promise<Feed> => {
     setLoading(true);
-    setError(null);
+    setError(false);
     try {
-      return await fetchFeedWithMedia('/feed/me/saved');
-    } catch (err: any) {
-      setError(err.message);
+      const params = new URLSearchParams();
+      if (limit !== undefined) params.append('limit', limit.toString());
+      if (offset !== undefined) params.append('offset', offset.toString());
+
+      const queryString = params.toString();
+      const endpoint = queryString ? `/feed/me/saved?${queryString}` : '/feed/me/saved';
+
+      const response = await request(endpoint, { method: 'GET' });
+      return enrichFeed(response);
+    } catch (err) {
+      setError(true);
       throw err;
     } finally {
       setLoading(false);
     }
   };
 
-  const getUserPublications = async (userId: string) => {
+  const getUserPublications = async (userId: string, limit?: number, offset?: number): Promise<Feed> => {
     setLoading(true);
-    setError(null);
+    setError(false);
     try {
-      return await fetchFeedWithMedia(`/feed/user/${userId}`);
-    } catch (err: any) {
-      setError(err.message);
+      const params = new URLSearchParams();
+      if (limit !== undefined) params.append('limit', limit.toString());
+      if (offset !== undefined) params.append('offset', offset.toString());
+
+      const queryString = params.toString();
+      const endpoint = queryString ? `/feed/user/${userId}?${queryString}` : `/feed/user/${userId}`;
+
+      const response = await request(endpoint, { method: 'GET' });
+      return enrichFeed(response);
+    } catch (err) {
+      setError(true);
       throw err;
     } finally {
       setLoading(false);

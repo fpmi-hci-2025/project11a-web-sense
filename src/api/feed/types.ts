@@ -1,27 +1,11 @@
+import type { UserResponse } from "../auth/types";
+import type { Publication } from "../publication/types";
+
 type FeedItemType = 'quote' | 'post' | 'article';
 type Visibility = 'public' | 'private' | 'community';
-export type UserRole = 'reader' | 'creator' | 'user' | 'expert' | 'super';
 
-type Statistic = {
-    publications_count: number;
-    followers_count: number;
-    following_count: number;
-    likes_received: number;
-}
 
-export type Author = {
-    id: string;
-    username: string;
-    email: string;
-    phone: string;
-    icon_url: string;
-    description: string;
-    role: UserRole;
-    registered_at: string;
-    statistic: Statistic;
-}
-
-export type Media = {
+export type MediaResponse = {
     id: string;
     owner_id: string;
     filename: string;
@@ -33,33 +17,32 @@ export type Media = {
 
 export interface FeedItem {
     id: string;
-    title?: string;
     author_id: string;
     type: FeedItemType;
-    content?: string;
-    source?: string;
     publication_date: string;
     visibility: Visibility;
+    title?: string;
+    content?: string;
+    source?: string;
     likes_count?: number;
     comments_count?: number;
     saved_count?: number;
-    author?: Author;
-    media?: Media[];
+    author?: UserResponse;
+    media?: MediaResponse[];
     is_liked?: boolean,
     is_saved?: boolean,
 }
 
-export interface FeedSuccessfulResponse {
+export interface FeedResponse {
     items: FeedItem[];
     total: number;
     limit: number;
     offset: number;
 }
 
-export interface FeedErrorResponse {
-    error: string;
-    message: string;
-    details: string;
+export type Feed = {
+    items: Publication[];
+    total: number;
+    limit: number;
+    offset: number;
 }
-
-export type FeedResponse = FeedSuccessfulResponse;

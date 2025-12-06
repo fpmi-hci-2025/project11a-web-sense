@@ -30,9 +30,9 @@ export const PublicationCard = ({
   const isArticle = publication.type === 'article';
 
   const roleClass =
-    publication.author?.role === 'Creator'
+    publication.author?.role === 'creator'
       ? styles.creator
-      : publication.author?.role === 'Expert'
+      : publication.author?.role === 'expert'
       ? styles.expert
       : styles.user;
 
@@ -52,7 +52,7 @@ export const PublicationCard = ({
                 initials={publication.author.username?.[0].toUpperCase()}
                 size="small"
                 clickable={true}
-                onClick={() => navigate(`/profile/${publication.author.id}`)}
+                onClick={() => navigate(`/profile/${publication.author?.id}`)}
               />
               <Typography className={styles.authorName} variant='body2'>{publication.author.username}</Typography>
             </div>
@@ -70,6 +70,7 @@ export const PublicationCard = ({
             <FormatQuoteIcon className={styles.quoteIcon} />
             <div className={styles.quoteContent}>{publication.content}</div>
           </div>
+          <Typography variant='body2' className={styles.publicationSource}>— {publication.source}</Typography>
         </>
       )}
 

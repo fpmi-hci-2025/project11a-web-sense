@@ -1,4 +1,4 @@
-type UserRole = 'Creator' | 'User' | 'Expert';
+import type { Role } from "../auth/types";
 
 type Media = {
   url: string;
@@ -8,7 +8,7 @@ type Author = {
   id: string;
   username?: string;
   iconUrl?: string;
-  role: UserRole;
+  role: Role;
 }
 
 export type PublicationType = 'post' | 'article' | 'quote';
@@ -26,6 +26,6 @@ export interface Publication {
   savedCount: number;
   isLiked: boolean;
   isSaved: boolean;
-  author: Author;
+  author?: Author;
   media?: Media;
 }

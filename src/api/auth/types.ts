@@ -1,26 +1,45 @@
-export type Role = 'User' | 'Expert' | 'Creator';
+type RoleResponse = 'user' | 'super' | 'reader' | 'creator' | 'expert';
+export type Role = Omit<RoleResponse, 'super' | 'reader'>;
+
+interface StatisticResponse {
+  publications_count?: number;
+  followers_count?: number;
+  following_count?: number;
+  likes_received?: number;
+}
 
 export interface UserResponse {
   id: string;
   username: string;
-  email: string;
-  phone?: string;
-  icon_url: string;
+  role: RoleResponse;
   registered_at: string;
+  phone?: string;
+  email?: string;
+  icon_url?: string;
   description: string;
-  role: Role;
-  statistic: undefined; // контракт
+  statistic: StatisticResponse;
 }
 
-export interface User {
+export interface AuthResponse {
+  access_token: string;
+  token_type: string;
+  expires_in: number;
+  user: UserResponse;
+}
+
+export interface LogoutResponse {
+  message: string;
+}
+
+export type User = {
   id: string;
   username: string;
-  email: string;
-  phone?: string;
-  iconUrl: string;
-  registeredAt: string;
-  description: string;
   role: Role;
+  registeredAt: string;
+  email?: string;
+  phone?: string;
+  iconUrl?: string;
+  description?: string;
 }
 
 export interface AuthContextType {

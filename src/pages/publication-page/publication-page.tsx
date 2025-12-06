@@ -43,17 +43,17 @@ export const PublicationPage = () => {
     fetchPublication();
   }, [id, getPublication, getComments]);
 
-  const handleCreateComment = async () => {
-    if (!id || !newComment.trim()) return;
+  // const handleCreateComment = async () => {
+  //   if (!id || !newComment.trim()) return;
 
-    try {
-      const comment = await createComment(id, newComment.trim());
-      setComments(prev => [...prev, comment]);
-      setNewComment('');
-    } catch (err: any) {
-      setError(err.message || 'Failed to create comment');
-    }
-  };
+  //   try {
+  //     const comment = await createComment(id, newComment.trim());
+  //     setComments(prev => [...prev, comment]);
+  //     setNewComment('');
+  //   } catch (err: any) {
+  //     setError(err.message || 'Failed to create comment');
+  //   }
+  // };
 
   if (error) {
     return (

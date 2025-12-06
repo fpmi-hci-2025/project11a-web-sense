@@ -3,7 +3,7 @@ import type { Publication } from './types';
 import type { User } from '../auth/types';
 import type { Comment } from '../comment/types';
 import { API_BASE_URL } from '../constants';
-import type { FeedItem, UserRole } from '../feed/types';
+import type { FeedItem } from '../feed/types';
 
 // Mock comments data for development
 const mockComments: Comment[] = [
