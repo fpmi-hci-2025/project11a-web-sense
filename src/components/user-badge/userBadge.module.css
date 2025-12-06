@@ -1,0 +1,21 @@
+@import '../../styles/theme.css';
+
+.badge {
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  padding: 7px !important;
+  color: var(--sense-text-color) !important;
+}
+
+.badge.expert {
+  background-color: var(--sense-expert-color)  !important;
+}
+
+.badge.user {
+  background-color: var(--sense-user-color)  !important;
+}
+
+.badge.creator {
+  background-color: var(--sense-creator-color)  !important;
+}
+

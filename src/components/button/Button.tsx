@@ -6,16 +6,22 @@ interface MuiButtonProps {
   variant?: 'text' | 'filled';
   label: string;
   onClick?: () => void;
+  type?: 'button' | 'submit' | 'reset';
+  disabled?: boolean;
 }
 
 export const Button = ({
   variant = 'filled',
   label,
   onClick,
+  type = 'button',
+  disabled = false,
 }: MuiButtonProps) => {
   return (
     <MuiButton
       onClick={onClick}
+      type={type}
+      disabled={disabled}
       className={`${styles.buttonBase} ${
         variant === 'filled' ? styles.filled : styles.text
       } sense-body-1`}

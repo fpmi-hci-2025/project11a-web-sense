@@ -1,19 +1,17 @@
-export type PublicationType = 'Post' | 'Article' | 'Creator';
+type UserRole = 'Creator' | 'User' | 'Expert';
 
-export interface PublicationResponse {
-  id: string;
-  authorId: string;
-  type: PublicationType;
-  title?: string;
-  content?: string;
-  source?: string;
-  publicationDate: string;
-  likes_count: number;
-  comments_count: number;
-  saved_count: number;
-  is_liked: boolean;
-  is_saved: boolean;
+type Media = {
+  url: string;
 }
+
+type Author = {
+  id: string;
+  username?: string;
+  iconUrl?: string;
+  role: UserRole;
+}
+
+export type PublicationType = 'post' | 'article' | 'quote';
 
 export interface Publication {
   id: string;
@@ -28,4 +26,6 @@ export interface Publication {
   savedCount: number;
   isLiked: boolean;
   isSaved: boolean;
+  author: Author;
+  media?: Media;
 }

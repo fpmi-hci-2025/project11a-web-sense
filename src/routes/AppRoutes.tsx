@@ -2,7 +2,7 @@ import { Routes, Route } from 'react-router-dom';
 import type { AppRoute } from './types';
 import PrivateRoute from './PrivateRoute';
 import { routes } from './routes';
-import { HomePage } from '../pages/HomePage/HomePage';
+import { HomePage } from '../pages/home-page/home-page';
 
 function renderRoutes(routeList: AppRoute[]) {
   return routeList.map((route) => {

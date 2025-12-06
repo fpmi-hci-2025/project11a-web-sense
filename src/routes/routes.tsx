@@ -1,8 +1,18 @@
+import { LoginPage } from '../pages/login-page';
+import { RegisterPage } from '../pages/register-page';
+import { PublicationPage } from '../pages/publication-page';
+
 export const routes = [
   {
     path: '*',
     element: <>Not found</>,
     name: 'Not found',
+  },
+  {
+    path: '/publication/:id',
+    element: <PublicationPage />,
+    protected: true,
+    name: 'Publication',
   },
   {
     path: '/profile',
@@ -12,19 +22,17 @@ export const routes = [
   },
   {
     path: '/auth',
-    element: <></>,
-    children: [
-      {
-        path: 'login',
-        element: <>Login</>,
-        name: 'Login',
-      },
-      {
-        path: 'register',
-        element: <>Register</>,
-        name: 'Register',
-      },
-    ],
-    name: 'Auth',
+    element: <LoginPage />,
+    name: 'Login',
   },
+  {
+    path: '/auth/login',
+    element: <LoginPage />,
+    name: 'Login',
+  },
+  {
+    path: '/auth/register',
+    element: <RegisterPage />,
+    name: 'Register',
+  }
 ];

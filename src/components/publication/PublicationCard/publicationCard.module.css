@@ -1,0 +1,219 @@
+@import '../../../styles/theme.css';
+
+.publicationCard {
+  background-color: var(--mui-background-default);
+  border: 1px solid var(--mui-divider);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  min-width: 40%;
+  max-width: 200px;
+}
+
+.publicationCard:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+}
+
+.publicationHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+  gap: 16px;
+}
+
+.publicationHeaderLeft {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.publicationHeaderRight {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.authorInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.authorName {
+  font-weight: 600 !important;
+  font-size: 14px;
+  color: var(--sense-text-button-color);
+  cursor: pointer;
+}
+
+.authorName:hover {
+  text-decoration: underline;
+}
+
+.publicationTitle {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--sense-text-color);
+  flex: 1;
+  line-height: 1.4;
+}
+
+.publicationDate {
+  font-size: 14px;
+  color: var(--mui-text-secondary);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.publicationContent {
+  margin-bottom: 16px;
+  color: var(--sense-text-color);
+  line-height: 1.7;
+  font-size: 16px;
+  word-wrap: break-word;
+  position: relative;
+  max-height: 90px;
+  overflow: hidden;
+}
+
+.publicationSource {
+  margin-bottom: 16px;
+  font-size: 14px;
+  color: var(--mui-text-secondary);
+}
+
+.publicationSource a {
+  color: var(--sense-text-button-color);
+  text-decoration: none;
+  word-break: break-all;
+}
+
+.publicationSource a:hover {
+  text-decoration: underline;
+}
+
+.quoteContainer {
+  margin-bottom: 16px;
+  padding: 20px;
+  background-color: var(--mui-background-default);
+  border-left: 4px solid var(--sense-text-button-color);
+  border-radius: 10px;
+  position: relative;
+}
+
+.quoteContainer.creator {
+  background: linear-gradient(180deg, var(--sense-creator-gradient), transparent);
+}
+
+.quoteContainer.expert {
+  background: linear-gradient(180deg, var(--sense-expert-gradient), transparent);
+}
+
+.quoteContainer.user {
+  background: linear-gradient(180deg, var(--sense-user-gradient), transparent);
+}
+
+.quoteIcon {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  font-size: 32px;
+  color: var(--mui-text-secondary);
+  opacity: 0.3;
+}
+
+.quoteContent {
+  padding-left: 40px;
+  font-style: italic;
+  font-size: 18px;
+  line-height: 1.6;
+  color: var(--sense-text-button-color);
+}
+
+.postImageContainer {
+  margin-bottom: 16px;
+  width: 100%;
+  border-radius: 8px;
+}
+
+.postImage {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+}
+
+.articleTitle {
+  margin: 0 0 12px 0;
+  font-size: 24px !important;
+  font-weight: 700 !important;
+  color: var(--sense-text-button-color);
+  line-height: 1.4;
+  margin-bottom: 15px !important;
+}
+
+.articleContainer {
+  margin-bottom: 16px;
+  padding: 10px;
+  background-color: var(--mui-background-default);
+  border-left: 4px solid var(--sense-text-button-color);
+  border-radius: 10px;
+  position: relative;
+}
+
+.articleContainer.creator {
+  background: linear-gradient(180deg, var(--sense-creator-gradient), transparent);
+}
+
+.articleContainer.expert {
+  background: linear-gradient(180deg, var(--sense-expert-gradient), transparent);
+}
+
+.articleContainer.user {
+  background: linear-gradient(180deg, var(--sense-user-gradient), transparent);
+}
+
+.articleContent {
+  padding-left: 20px;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--sense-text-button-color);
+}
+
+@media (max-width: 400px) {
+   .publicationCard {
+    min-width: 300px;
+    max-width: auto;
+    width: fit-content
+  }
+}
+
+@media (max-width: 600px) {
+  .publicationCard {
+    min-width: 90vw;
+    max-width: 90vw;
+  }
+}
+
+@media (min-width: 601px) and (max-width: 1024px) {
+  .publicationCard {
+    min-width: 70vw;
+    max-width: 70vw;
+  }
+}
+
+@media (min-width: 1025px) {
+  .publicationCard {
+    min-width: 50vw;
+    max-width: 50vw;
+  }
+}
+
+

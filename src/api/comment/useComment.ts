@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import type { CommentResponse, Comment } from './types';
-
-const API_BASE_URL = 'https://your-api.com'; // ← убран пробел в конце
+import { API_BASE_URL } from '../constants';
 
 const getAuthToken = (): string | null => localStorage.getItem('authToken');
 

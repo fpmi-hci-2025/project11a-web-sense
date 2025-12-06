@@ -1,0 +1,48 @@
+@import '../../../styles/theme.css';
+
+.publicationActions {
+  display: flex;
+  gap: 8px;
+  padding-top: 16px;
+  border-top: 1px solid var(--mui-divider);
+}
+
+.actionButton {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.actionButton:hover {
+  background-color: var(--mui-action-hover);
+}
+
+.actionButton.liked .icon {
+  color: var(--sense-text-button-color);
+}
+
+.actionButton.saved .icon {
+  color: var(--sense-text-button-color);
+}
+
+.icon {
+  font-size: 30px;
+  color: var(--sense-text-button-color);
+}
+
+.actionCount {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--sense-text-button-color);
+  min-width: 15px;
+  text-align: center;
+}
+
+.actionButton.liked .actionCount,
+.actionButton.saved .actionCount {
+  color: var(--sense-text-button-color);
+}
+
