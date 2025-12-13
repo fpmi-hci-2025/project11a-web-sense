@@ -1,0 +1,17 @@
+.ai-button {
+  border-radius: 50%;
+  color: var(--sense-text-color) !important;
+  transition: background-color 0.25s ease;
+}
+
+.ai-button.expert:hover {
+  background-color: var(--sense-expert-gradient);
+}
+
+.ai-button.user:hover {
+  background-color: var(--sense-user-gradient);
+}
+
+.ai-button.creator:hover {
+  background-color: var(--sense-creator-gradient);
+}

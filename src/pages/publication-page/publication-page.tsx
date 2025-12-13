@@ -12,14 +12,14 @@ import {
 } from '@mui/material';
 import { ArrowBack as ArrowBackIcon } from '@mui/icons-material';
 import { usePublication } from '../../api/publication/usePublication';
-import { useComment } from '../../api/comment/useComment';
 import type { Publication } from '../../api/publication/types';
-import type { Comment } from '../../api/comment/types';
 import { PublicationCard } from '../../components/publication/PublicationCard';
 import { PageWrapper } from '../page-wrapper/page-wrapper';
 import { Button } from '../../components/button';
+import { type Comment } from '../../api/publication/types';
 
 import styles from './publication-page.module.css';
+import { Comments } from '../../components/comments/comments';
 
 export const PublicationPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -30,8 +30,6 @@ export const PublicationPage = () => {
     getComments,
     loading: publicationLoading,
   } = usePublication();
-  const { loading: commentLoading } = useComment();
-
   const [publication, setPublication] = useState<Publication | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState('');
@@ -69,7 +67,8 @@ export const PublicationPage = () => {
         setPublication(publicationData);
 
         const commentsData = await getComments(id);
-        setComments(commentsData);
+
+        if (commentsData) setComments(commentsData);
       } catch (err) {
         setError(true);
         throw err;
@@ -165,7 +164,7 @@ export const PublicationPage = () => {
                   sx={{ mb: 2 }}
                 />
                 <Button
-                  label={commentLoading ? 'Posting...' : 'Post Comment'}
+                  label={publicationLoading ? 'Posting...' : 'Post Comment'}
                 />
               </Paper>
 
@@ -179,38 +178,10 @@ export const PublicationPage = () => {
                     No comments yet. Be the first to comment!
                   </Typography>
                 ) : (
-                  // comments.map((comment) => (
-                  //   <Paper key={comment.id} elevation={0} sx={{ p: 3 , borderRadius: 5}}>
-                  //     <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
-                  //       <Avatar
-                  //         src=""
-                  //         alt="Comment author"
-                  //         initials="U"
-                  //         size="small"
-                  //       />
-                  //       <Box sx={{ flex: 1 }}>
-                  //         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                  //           <Typography variant="subtitle2" fontWeight='700'>
-                  //             {comment.authorId}
-                  //           </Typography>
-                  //           <UserBadge role="User" />
-                  //           <Typography variant="caption" color="text.secondary">
-                  //             {new Date(comment.createdAt).toLocaleDateString()}
-                  //           </Typography>
-                  //         </Box>
-                  //         <Typography variant="body1" sx={{ mb: 1 }}>
-                  //           {comment.text}
-                  //         </Typography>
-                  //         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                  //           <Typography variant="caption" color="text.secondary">
-                  //             {comment.likesCount} likes
-                  //           </Typography>
-                  //         </Box>
-                  //       </Box>
-                  //     </Box>
-                  //   </Paper>
-                  // ))
-                  <></>
+                  <Comments
+                    commentsResponse={comments}
+                    loading={publicationLoading}
+                  />
                 )}
               </Box>
             </Box>
