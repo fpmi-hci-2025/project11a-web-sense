@@ -8,6 +8,7 @@ interface MuiButtonProps {
   onClick?: () => void;
   type?: 'button' | 'submit' | 'reset';
   disabled?: boolean;
+  children?: React.ReactNode;
 }
 
 export const Button = ({
@@ -16,6 +17,7 @@ export const Button = ({
   onClick,
   type = 'button',
   disabled = false,
+  children,
 }: MuiButtonProps) => {
   return (
     <MuiButton
@@ -27,6 +29,7 @@ export const Button = ({
       } sense-body-1`}
     >
       {label}
+      {children}
     </MuiButton>
   );
 };

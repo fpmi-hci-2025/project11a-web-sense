@@ -1,7 +1,11 @@
 import { useState } from 'react';
-import type { Publication } from './types';
-import type { Role } from '../auth/types';
-import type { Comment } from '../comment/types';
+import type {
+  CreatePublicationData,
+  Publication,
+  Comment,
+  CommentsResponse,
+} from './types';
+import type { Role, UserResponse } from '../auth/types';
 import { API_BASE_URL } from '../constants';
 import type { FeedItem } from '../feed/types';
 import { mapUserResponse } from '../auth/useAuth';
@@ -10,15 +14,21 @@ const getAuthToken = (): string | null => localStorage.getItem('authToken');
 
 const request = async (endpoint: string, options: RequestInit = {}) => {
   const token = getAuthToken();
-  const headers = {
-    'Content-Type': 'application/json',
+
+  const headers: Record<string, string> = {
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    ...options.headers,
   };
+
+  if (!(options.body instanceof FormData)) {
+    headers['Content-Type'] = 'application/json';
+  }
 
   const res = await fetch(`${API_BASE_URL}${endpoint}`, {
     ...options,
-    headers,
+    headers: {
+      ...headers,
+      ...options.headers,
+    },
   });
 
   if (!res.ok) {
@@ -67,6 +77,32 @@ const mapPublicationResponseToPublication = (
     : { id: '', username: '', iconUrl: '', role: 'User' },
 });
 
+const mapComments = (response: CommentsResponse): Comment[] => {
+  return response.items.map((item) => ({
+    id: item.id,
+    publicationId: item.publication_id,
+    parentId: item.parent_id || null,
+    authorId: item.author_id,
+    text: item.text,
+    createdAt: item.created_at,
+    likesCount: item.likes_count,
+    isLiked: item.is_liked,
+    author: item.author
+      ? {
+          id: item.author.id,
+          username: item.author.username,
+          email: item.author.email,
+          phone: item.author.phone,
+          iconUrl: item.author.icon_url,
+          description: item.author.description,
+          role: item.author.role as UserResponse['role'],
+          registeredAt: item.author.registered_at,
+          statistic: item.author.statistic,
+        }
+      : undefined,
+  }));
+};
+
 const fetchMediaUrl = async (mediaId: string): Promise<string> => {
   console.log('Fetching media URL for mediaId:', mediaId);
   const res = await request(`/media/${mediaId}/file`, {
@@ -87,7 +123,6 @@ const enrichPublication = async (
   console.log('Enriching publication:', publication.id);
   const parsedPublication = mapPublicationResponseToPublication(publication);
 
-  // Enrich author data
   if (parsedPublication.authorId) {
     try {
       console.log('Fetching author data for:', parsedPublication.authorId);
@@ -101,7 +136,6 @@ const enrichPublication = async (
     }
   }
 
-  // Enrich media data
   if (publication.media && publication.media[0]) {
     try {
       console.log('Enriching media for publication:', publication.id);
@@ -125,17 +159,50 @@ export const usePublication = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
 
-  const createPublication = async (data: {
-    title: string;
-    content: string;
-  }) => {
+  const uploadMedia = async (file: File) => {
+    if (!file.type.startsWith('image/')) {
+      throw new Error('Invalid file type');
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      throw new Error('File is too large (max 10MB)');
+    }
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    return request('/media/upload', {
+      method: 'POST',
+      body: formData,
+    });
+  };
+
+  const createPublication = async (data: CreatePublicationData) => {
     setLoading(true);
     setError(false);
+
     try {
+      let mediaId: string | undefined;
+
+      if (data.type === 'post' && data.image) {
+        mediaId = await uploadMedia(data.image);
+      }
+
+      const payload = {
+        type: data.type,
+        title: data.title,
+        content: data.content,
+        description: data.description,
+        source: data.source,
+        mediaId: data.type === 'post' ? mediaId : undefined,
+        visibility: 'public',
+      };
+
       const response: FeedItem = await request('/publication/create', {
         method: 'POST',
-        body: JSON.stringify(data),
+        body: JSON.stringify(payload),
       });
+
       return await enrichPublication(response);
     } catch (err) {
       setError(true);
@@ -149,16 +216,12 @@ export const usePublication = () => {
     setLoading(true);
     setError(false);
     try {
-      console.log('getPublication called for id:', id);
       const response: FeedItem = await request(`/publication/${id}`, {
         method: 'GET',
       });
-      console.log('Got response, enriching publication...');
       const enriched = await enrichPublication(response);
-      console.log('Publication enriched successfully');
       return enriched;
     } catch (err) {
-      console.error('Error in getPublication:', err);
       setError(true);
       throw err;
     } finally {
@@ -224,10 +287,16 @@ export const usePublication = () => {
     setError(false);
 
     try {
-      const comments: Comment[] = await request(`/publication/${id}/comments`, {
-        method: 'GET',
-      });
-      return comments;
+      const response: CommentsResponse = await request(
+        `/publication/${id}/comments`,
+        {
+          method: 'GET',
+        },
+      );
+
+      if (response.items === null) return null;
+
+      return mapComments(response);
     } catch (err) {
       setError(true);
       throw err;
@@ -241,7 +310,7 @@ export const usePublication = () => {
     setError(false);
 
     try {
-      const comment: Comment = await request(`/publication/${id}/comments`, {
+      const comment = await request(`/publication/${id}/comments`, {
         method: 'POST',
         body: JSON.stringify({ content }),
       });
