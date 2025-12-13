@@ -2,12 +2,18 @@ import { LoginPage } from '../pages/login-page';
 import { RegisterPage } from '../pages/register-page';
 import { PublicationPage } from '../pages/publication-page';
 import { CreatePostPage } from '../pages/create-post-pages/create-post-page';
+import { AboutPage } from '../pages/about-page';
 
 export const routes = [
   {
     path: '*',
     element: <>Not found</>,
     name: 'Not found',
+  },
+  {
+    path: '/about',
+    element: <AboutPage />,
+    name: 'About',
   },
   {
     path: '/publication/:id',
