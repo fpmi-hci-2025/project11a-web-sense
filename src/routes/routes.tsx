@@ -3,6 +3,7 @@ import { RegisterPage } from '../pages/register-page';
 import { PublicationPage } from '../pages/publication-page';
 import { CreatePostPage } from '../pages/create-post-pages/create-post-page';
 import { AboutPage } from '../pages/about-page';
+import { TeamPage } from '../pages/team-page/team-page';
 
 export const routes = [
   {
@@ -14,6 +15,11 @@ export const routes = [
     path: '/about',
     element: <AboutPage />,
     name: 'About',
+  },
+  {
+    path: '/team',
+    element: <TeamPage />,
+    name: 'Team',
   },
   {
     path: '/publication/:id',
