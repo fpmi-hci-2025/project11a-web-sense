@@ -29,14 +29,16 @@ export const HomePage = () => {
 
   return (
     <PageWrapper>
-      <Logo
-        size="large"
-        className={`${styles.logo} ${logoVisible ? styles.loaded : ''}`}
-      />
+      <div className={styles.container}>
+        <Logo
+          size="large"
+          className={`${styles.logo} ${logoVisible ? styles.loaded : ''}`}
+        />
 
-      <Typography variant="body1" className={styles.title}>
-        Social network for sharing thoughts
-      </Typography>
+        <Typography variant="body1" className={styles.title}>
+          Social network for sharing thoughts
+        </Typography>
+      </div>
     </PageWrapper>
   );
 };

@@ -4,6 +4,7 @@ import { PublicationPage } from '../pages/publication-page';
 import { CreatePostPage } from '../pages/create-post-pages/create-post-page';
 import { AboutPage } from '../pages/about-page';
 import { TeamPage } from '../pages/team-page/team-page';
+import { ProfilePage } from '../pages/profile-page';
 
 export const routes = [
   {
@@ -29,9 +30,15 @@ export const routes = [
   },
   {
     path: '/profile',
-    element: <>Profile</>,
+    element: <ProfilePage />,
     protected: true,
     name: 'Profile',
+  },
+  {
+    path: '/profile/:id',
+    element: <ProfilePage />,
+    protected: true,
+    name: 'User Profile',
   },
   {
     path: '/auth',

@@ -217,8 +217,8 @@
 
 @media (max-width: 600px) {
   .publicationCard {
-    min-width: 90vw;
-    max-width: 90vw;
+    min-width: 80vw;
+    max-width: 80vw;
   }
 }
 

@@ -52,7 +52,7 @@ export const Comments = ({ commentsResponse, loading }: CommentsProps) => {
                 }}
               >
                 <Typography variant="subtitle2" fontWeight="700">
-                  {comment.author?.username || comment.authorId}
+                  {comment.author?.username}
                 </Typography>
                 <UserBadge role={comment.author?.role || 'User'} />
                 <Typography variant="caption" color="text.secondary">

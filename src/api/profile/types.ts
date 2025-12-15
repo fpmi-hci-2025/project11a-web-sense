@@ -1,15 +1,4 @@
-export interface ProfileResponse {
-  id: string;
-  email: string;
-  username?: string;
-  full_name?: string;
-  bio?: string;
-  avatar_url?: string;
-  created_at: string;
-  publications_count: number;
-  followers_count: number;
-  following_count: number;
-}
+import type { Role } from '../auth/types';
 
 export interface Profile {
   id: string;
@@ -19,15 +8,5 @@ export interface Profile {
   bio?: string;
   avatarUrl?: string;
   createdAt: string;
-  publicationsCount: number;
-  followersCount: number;
-  followingCount: number;
-}
-
-export interface ProfileStats {
-  publicationsCount: number;
-  followersCount: number;
-  followingCount: number;
-  likesGiven: number;
-  likesReceived: number;
+  role: Role;
 }

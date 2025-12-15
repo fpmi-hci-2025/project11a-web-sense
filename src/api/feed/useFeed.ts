@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import type { Feed, FeedItem, FeedResponse } from './types';
 import { API_BASE_URL } from '../constants';
 import type { Publication } from '../publication/types';
@@ -6,10 +6,7 @@ import { mapUserResponse } from '../auth/useAuth';
 
 const getAuthToken = (): string | null => localStorage.getItem('authToken');
 
-const request = async (
-  endpoint: string,
-  options: RequestInit = {}
-) => {
+const request = async (endpoint: string, options: RequestInit = {}) => {
   const token = getAuthToken();
   const headers = {
     'Content-Type': 'application/json',
@@ -68,7 +65,10 @@ const enrichFeedItem = async (publication: FeedItem) => {
       const authorData = await fetchAuthorData(parsedPublication.authorId);
       parsedPublication.author = authorData;
     } catch (error) {
-      console.error(`Failed to fetch author data for userId: ${parsedPublication.authorId}`, error);
+      console.error(
+        `Failed to fetch author data for userId: ${parsedPublication.authorId}`,
+        error,
+      );
     }
   }
 
@@ -80,7 +80,10 @@ const enrichFeedItem = async (publication: FeedItem) => {
         media: { url: mediaUrl },
       };
     } catch (error) {
-      console.error(`Failed to fetch media for mediaId: ${publication.media[0].id}`, error);
+      console.error(
+        `Failed to fetch media for mediaId: ${publication.media[0].id}`,
+        error,
+      );
     }
   }
 
@@ -88,7 +91,10 @@ const enrichFeedItem = async (publication: FeedItem) => {
 };
 
 const enrichFeed = async (feed: FeedResponse): Promise<Feed> => {
-  const items = await Promise.all(feed.items.map(enrichFeedItem));
+  const items =
+    feed.items && feed.items.length > 0
+      ? await Promise.all(feed.items.map(enrichFeedItem))
+      : [];
   return { ...feed, items };
 };
 
@@ -96,89 +102,120 @@ export const useFeed = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
 
-  const getFeed = async (limit?: number, offset?: number): Promise<Feed> => {
-    setLoading(true);
-    setError(false);
-    try {
-      const params = new URLSearchParams();
-      if (limit !== undefined) params.append('limit', limit.toString());
-      if (offset !== undefined) params.append('offset', offset.toString());
+  const getFeed = useCallback(
+    async (limit?: number, offset?: number): Promise<Feed> => {
+      setLoading(true);
+      setError(false);
+      try {
+        const params = new URLSearchParams();
+        if (limit !== undefined) params.append('limit', limit.toString());
+        if (offset !== undefined) params.append('offset', offset.toString());
 
-      const queryString = params.toString();
-      const endpoint = queryString ? `/feed?${queryString}` : '/feed';
+        const queryString = params.toString();
+        const endpoint = queryString ? `/feed?${queryString}` : '/feed';
 
-      const feedResponse = await request(endpoint, { method: 'GET' });
-      return enrichFeed(feedResponse);
-    } catch (err) {
-      setError(true);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  };
+        console.log('getFeed request:', { endpoint, limit, offset });
+        const feedResponse = await request(endpoint, { method: 'GET' });
+        console.log('getFeed response:', {
+          itemsCount: feedResponse.items?.length || 0,
+          total: feedResponse.total,
+          limit,
+          offset,
+        });
 
-  const getMyPublications = async (limit?: number, offset?: number): Promise<Feed> => {
-    setLoading(true);
-    setError(false);
-    try {
-      const params = new URLSearchParams();
-      if (limit !== undefined) params.append('limit', limit.toString());
-      if (offset !== undefined) params.append('offset', offset.toString());
+        const enrichedFeed = await enrichFeed(feedResponse);
+        console.log('getFeed enriched:', {
+          itemsCount: enrichedFeed.items?.length || 0,
+          total: enrichedFeed.total,
+        });
 
-      const queryString = params.toString();
-      const endpoint = queryString ? `/feed/me?${queryString}` : '/feed/me';
+        return enrichedFeed;
+      } catch (err) {
+        console.error('getFeed error:', err);
+        setError(true);
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [],
+  );
 
-      const response = await request(endpoint, { method: 'GET' });
-      return enrichFeed(response);
-    } catch (err) {
-      setError(true);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  };
+  const getMyPublications = useCallback(
+    async (limit?: number, offset?: number): Promise<Feed> => {
+      setLoading(true);
+      setError(false);
+      try {
+        const params = new URLSearchParams();
+        if (limit !== undefined) params.append('limit', limit.toString());
+        if (offset !== undefined) params.append('offset', offset.toString());
 
-  const getSavedPublications = async (limit?: number, offset?: number): Promise<Feed> => {
-    setLoading(true);
-    setError(false);
-    try {
-      const params = new URLSearchParams();
-      if (limit !== undefined) params.append('limit', limit.toString());
-      if (offset !== undefined) params.append('offset', offset.toString());
+        const queryString = params.toString();
+        const endpoint = queryString ? `/feed/me?${queryString}` : '/feed/me';
 
-      const queryString = params.toString();
-      const endpoint = queryString ? `/feed/me/saved?${queryString}` : '/feed/me/saved';
+        const response = await request(endpoint, { method: 'GET' });
+        return enrichFeed(response);
+      } catch (err) {
+        setError(true);
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [],
+  );
 
-      const response = await request(endpoint, { method: 'GET' });
-      return enrichFeed(response);
-    } catch (err) {
-      setError(true);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  };
+  const getSavedPublications = useCallback(
+    async (limit?: number, offset?: number): Promise<Feed> => {
+      setLoading(true);
+      setError(false);
+      try {
+        const params = new URLSearchParams();
+        if (limit !== undefined) params.append('limit', limit.toString());
+        if (offset !== undefined) params.append('offset', offset.toString());
 
-  const getUserPublications = async (userId: string, limit?: number, offset?: number): Promise<Feed> => {
-    setLoading(true);
-    setError(false);
-    try {
-      const params = new URLSearchParams();
-      if (limit !== undefined) params.append('limit', limit.toString());
-      if (offset !== undefined) params.append('offset', offset.toString());
+        const queryString = params.toString();
+        const endpoint = queryString
+          ? `/feed/me/saved?${queryString}`
+          : '/feed/me/saved';
 
-      const queryString = params.toString();
-      const endpoint = queryString ? `/feed/user/${userId}?${queryString}` : `/feed/user/${userId}`;
+        const response = await request(endpoint, { method: 'GET' });
+        return enrichFeed(response);
+      } catch (err) {
+        setError(true);
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [],
+  );
 
-      const response = await request(endpoint, { method: 'GET' });
-      return enrichFeed(response);
-    } catch (err) {
-      setError(true);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  };
+  const getUserPublications = useCallback(
+    async (userId: string, limit?: number, offset?: number): Promise<Feed> => {
+      setLoading(true);
+      setError(false);
+      try {
+        const params = new URLSearchParams();
+        if (limit !== undefined) params.append('limit', limit.toString());
+        if (offset !== undefined) params.append('offset', offset.toString());
+
+        const queryString = params.toString();
+        const endpoint = queryString
+          ? `/feed/user/${userId}?${queryString}`
+          : `/feed/user/${userId}`;
+
+        const response = await request(endpoint, { method: 'GET' });
+        return enrichFeed(response);
+      } catch (err) {
+        setError(true);
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [],
+  );
 
   return {
     loading,

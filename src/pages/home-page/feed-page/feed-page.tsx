@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useFeed } from '../../../api/feed/useFeed';
 import { PublicationCard } from '../../../components/publication/PublicationCard';
 import styles from './feed-page.module.css';
@@ -7,10 +7,13 @@ import { useNavigate } from 'react-router-dom';
 import { CircularProgress, Box } from '@mui/material';
 
 const PAGE_SIZE = 10;
+const SCROLL_THRESHOLD = 200;
 
 export const FeedPage = () => {
   const { getFeed, loading } = useFeed();
   const navigate = useNavigate();
+
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
   const [publications, setPublications] = useState<Publication[]>([]);
   const [offset, setOffset] = useState(0);
@@ -33,17 +36,19 @@ export const FeedPage = () => {
     };
 
     loadInitialFeed();
-  }, []);
+  }, [getFeed]);
 
   const loadMorePublications = useCallback(async () => {
     if (isLoadingMore || !hasMore || loading) return;
 
     setIsLoadingMore(true);
+
     try {
       const feed = await getFeed(PAGE_SIZE, offset);
+
       if (feed.items.length > 0) {
-        setPublications(prev => [...prev, ...feed.items]);
-        setOffset(prev => prev + PAGE_SIZE);
+        setPublications((prev) => [...prev, ...feed.items]);
+        setOffset((prev) => prev + PAGE_SIZE);
         setHasMore(feed.items.length === PAGE_SIZE);
       } else {
         setHasMore(false);
@@ -53,44 +58,44 @@ export const FeedPage = () => {
     } finally {
       setIsLoadingMore(false);
     }
-  }, [offset, isLoadingMore, hasMore, loading, getFeed]);
+  }, [isLoadingMore, hasMore, loading, getFeed, offset]);
 
   const handleScroll = useCallback(() => {
-    const scrollTop = window.scrollY;
-    const windowHeight = window.innerHeight;
-    const documentHeight = document.documentElement.scrollHeight;
+    const container = containerRef.current;
+    if (!container) return;
 
-    if (documentHeight - (scrollTop + windowHeight) < 200) {
+    const { scrollTop, scrollHeight, clientHeight } = container;
+
+    if (scrollHeight - (scrollTop + clientHeight) <= SCROLL_THRESHOLD) {
       loadMorePublications();
     }
   }, [loadMorePublications]);
 
-  useEffect(() => {
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [handleScroll]);
-
   const handlePublicationUpdate = (updatedItem: Publication) => {
     setPublications((prev) =>
-      prev?.map((item) => (item.id === updatedItem.id ? updatedItem : item))
+      prev.map((item) => (item.id === updatedItem.id ? updatedItem : item)),
     );
   };
 
-  const handleCommentClick = (publicationId: string) => navigate(`/publication/${publicationId}`);
+  const handleCommentClick = (publicationId: string) =>
+    navigate(`/publication/${publicationId}`);
 
   if (initialLoading) {
     return (
       <div className={styles.container}>
         <div className={styles.loaderWrapper}>
-          <div className={styles.loader} />
-          <CircularProgress size={90} color="inherit" />
+          <CircularProgress size={90} />
         </div>
       </div>
     );
   }
 
   return (
-    <div className={styles.container}>
+    <div
+      ref={containerRef}
+      className={styles.container}
+      onScroll={handleScroll}
+    >
       <div className={styles.feed}>
         {publications.length === 0 ? (
           <div className={styles.empty}>Feed is empty</div>
@@ -99,7 +104,7 @@ export const FeedPage = () => {
             {publications.map((item) => (
               <PublicationCard
                 key={item.id}
-                isFeed={true}
+                isFeed
                 publication={item}
                 onUpdate={handlePublicationUpdate}
                 onCommentClick={handleCommentClick}
@@ -112,7 +117,7 @@ export const FeedPage = () => {
               </Box>
             )}
 
-            {!hasMore && publications.length > 0 && (
+            {!hasMore && (
               <Box sx={{ textAlign: 'center', py: 4, color: 'text.secondary' }}>
                 You've reached the end of the feed
               </Box>
@@ -123,4 +128,3 @@ export const FeedPage = () => {
     </div>
   );
 };
-
