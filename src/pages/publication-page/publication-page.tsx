@@ -116,7 +116,7 @@ export const PublicationPage = () => {
   return (
     <PageWrapper>
       <div className={styles.container}>
-        <Toolbar>
+        <Toolbar sx={{ width: '85vw' }}>
           <IconButton
             edge="start"
             color="inherit"

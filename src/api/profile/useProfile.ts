@@ -1,13 +1,11 @@
-import { useState } from 'react';
-import type { Profile, ProfileResponse, ProfileStats } from './types';
+import { useCallback, useState } from 'react';
+import type { Profile } from './types';
 import { API_BASE_URL } from '../constants';
+import type { UserResponse } from '../auth/types';
 
 const getAuthToken = (): string | null => localStorage.getItem('authToken');
 
-const request = async (
-  endpoint: string,
-  options: RequestInit = {}
-): Promise<any> => {
+const request = async (endpoint: string, options: RequestInit = {}) => {
   const token = getAuthToken();
   const headers = {
     'Content-Type': 'application/json',
@@ -28,101 +26,115 @@ const request = async (
   return res.json();
 };
 
-const mapProfileResponseToProfile = (res: ProfileResponse): Profile => ({
+const mapProfileResponseToProfile = (res: UserResponse): Profile => ({
   id: res.id,
-  email: res.email,
+  email: res.email || '',
+  bio: res.description,
   username: res.username,
-  fullName: res.full_name,
-  bio: res.bio,
-  avatarUrl: res.avatar_url,
-  createdAt: res.created_at,
-  publicationsCount: res.publications_count,
-  followersCount: res.followers_count,
-  followingCount: res.following_count,
+  avatarUrl: res.icon_url,
+  createdAt: res.registered_at,
+  role: res.role,
 });
 
-const mapStatsResponseToStats = (res: any): ProfileStats => ({
-  publicationsCount: res.publications_count ?? 0,
-  followersCount: res.followers_count ?? 0,
-  followingCount: res.following_count ?? 0,
-  likesGiven: res.likes_given ?? 0,
-  likesReceived: res.likes_received ?? 0,
-});
+const fetchAvatarUrl = async (avatarId: string): Promise<string> => {
+  console.log('Fetching avatar URL for avatarId:', avatarId);
+  try {
+    const res = await request(`/media/${avatarId}/file`, {
+      method: 'GET',
+    });
+    return res.url;
+  } catch (error) {
+    console.error('Failed to fetch avatar URL:', error);
+    return `https://i.pravatar.cc/150?u=${avatarId}`;
+  }
+};
+
+const enrichProfileWithAvatar = async (profile: Profile): Promise<Profile> => {
+  if (profile.avatarUrl && !profile.avatarUrl.startsWith('http')) {
+    try {
+      const avatarUrl = await fetchAvatarUrl(profile.avatarUrl);
+      return {
+        ...profile,
+        avatarUrl,
+      };
+    } catch (error) {
+      console.error(`Failed to fetch avatar for profile ${profile.id}:`, error);
+      return {
+        ...profile,
+        avatarUrl: `https://i.pravatar.cc/150?u=${profile.id}`,
+      };
+    }
+  }
+  return profile;
+};
 
 export const useProfile = () => {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<boolean>(false);
 
-  const getMyProfile = async () => {
+  const getMyProfile = useCallback(async () => {
     setLoading(true);
-    setError(null);
+    setError(false);
     try {
-      const response: ProfileResponse = await request('/profile/me', {
+      const response: UserResponse = await request('/profile/me', {
         method: 'GET',
       });
-      return mapProfileResponseToProfile(response);
-    } catch (err: any) {
-      setError(err.message);
-      throw err;
+      const profile = mapProfileResponseToProfile(response);
+      return await enrichProfileWithAvatar(profile);
+    } catch {
+      setError(true);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const updateMyProfile = async (data: Partial<Omit<Profile, 'id' | 'email' | 'createdAt'>>) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const payload = {
-        username: data.username,
-        full_name: data.fullName,
-        bio: data.bio,
-        avatar_url: data.avatarUrl,
-      };
-      const response: ProfileResponse = await request('/profile/me', {
-        method: 'POST',
-        body: JSON.stringify(payload),
-      });
-      return mapProfileResponseToProfile(response);
-    } catch (err: any) {
-      setError(err.message);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  };
+  const updateMyProfile = useCallback(
+    async (data: Partial<Omit<Profile, 'id' | 'email' | 'createdAt'>>) => {
+      setLoading(true);
+      setError(false);
+      try {
+        const payload = {
+          username: data.username,
+          full_name: data.fullName,
+          bio: data.bio,
+          avatar_url: data.avatarUrl,
+        };
+        const response: UserResponse = await request('/profile/me', {
+          method: 'POST',
+          body: JSON.stringify(payload),
+        });
+        return mapProfileResponseToProfile(response);
+      } catch {
+        setError(true);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [],
+  );
 
-  const getUserProfile = async (id: string) => {
+  const getUserProfile = useCallback(async (id: string) => {
     setLoading(true);
-    setError(null);
+    setError(false);
     try {
-      const response: ProfileResponse = await request(`/profile/${id}`, {
+      const response: UserResponse = await request(`/profile/${id}`, {
         method: 'GET',
       });
-      return mapProfileResponseToProfile(response);
-    } catch (err: any) {
-      setError(err.message);
-      throw err;
+      const profile = mapProfileResponseToProfile(response);
+      return await enrichProfileWithAvatar(profile);
+    } catch {
+      setError(true);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const getUserStats = async (id: string) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await request(`/profile/${id}/stats`, {
-        method: 'GET',
-      });
-      return mapStatsResponseToStats(response);
-    } catch (err: any) {
-      setError(err.message);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  };
+  const getAvatarUrl = useCallback(
+    async (avatarId: string): Promise<string> => {
+      return await fetchAvatarUrl(avatarId);
+    },
+    [],
+  );
 
   return {
     loading,
@@ -130,6 +142,6 @@ export const useProfile = () => {
     getMyProfile,
     updateMyProfile,
     getUserProfile,
-    getUserStats,
+    getAvatarUrl,
   };
 };

@@ -3,8 +3,9 @@ import { useNavigate, Link } from 'react-router-dom';
 import { TextField } from '@mui/material';
 import { Button } from '../../components/button';
 import { useAuth } from '../../api/auth/useAuth';
+import { Header } from '../../components/header';
+import { Footer } from '../../components/footer';
 import styles from './login-page.module.css';
-import { PageWrapper } from '../page-wrapper/page-wrapper';
 
 export const LoginPage = () => {
   const navigate = useNavigate();
@@ -56,52 +57,55 @@ export const LoginPage = () => {
   };
 
   return (
-    <PageWrapper>
-      <div className={styles.formWrapper}>
-        <h1 className={styles.title}>Login</h1>
-        <form onSubmit={handleSubmit} className={styles.form}>
-          <TextField
-            className={styles.textField}
-            label="Login"
-            type="text"
-            value={login}
-            onChange={(e) => setLogin(e.target.value)}
-            error={!!loginError}
-            helperText={loginError}
-            fullWidth
-            margin="normal"
-            disabled={loading}
-            autoComplete="username"
-          />
-          <TextField
-            className={styles.textField}
-            label="Password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            error={!!passwordError}
-            helperText={passwordError}
-            fullWidth
-            margin="normal"
-            disabled={loading}
-            autoComplete="current-password"
-          />
-          {error && <div className={styles.error}>{error}</div>}
-          <Button
-            variant="filled"
-            label={loading ? 'Login...' : 'Login'}
-            type="submit"
-            disabled={loading}
-          />
-          <div className={styles.linkWrapper}>
-            <span>Don't have an account? </span>
-            <Link to="/auth/register" className={styles.link}>
-              Register
-            </Link>
-          </div>
-        </form>
+    <div>
+      <Header showAvatar={false} showLogo={true} showLoginButton={false} />
+      <div className={styles.container}>
+        <div className={styles.formWrapper}>
+          <h1 className={styles.title}>Login</h1>
+          <form onSubmit={handleSubmit} className={styles.form}>
+            <TextField
+              className={styles.textField}
+              label="Login"
+              type="text"
+              value={login}
+              onChange={(e) => setLogin(e.target.value)}
+              error={!!loginError}
+              helperText={loginError}
+              fullWidth
+              margin="normal"
+              disabled={loading}
+              autoComplete="username"
+            />
+            <TextField
+              className={styles.textField}
+              label="Password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              error={!!passwordError}
+              helperText={passwordError}
+              fullWidth
+              margin="normal"
+              disabled={loading}
+              autoComplete="current-password"
+            />
+            {error && <div className={styles.error}>{error}</div>}
+            <Button
+              variant="filled"
+              label={loading ? 'Login...' : 'Login'}
+              type="submit"
+              disabled={loading}
+            />
+            <div className={styles.linkWrapper}>
+              <span>Don't have an account? </span>
+              <Link to="/auth/register" className={styles.link}>
+                Register
+              </Link>
+            </div>
+          </form>
+        </div>
       </div>
-    </PageWrapper>
+      <Footer />
+    </div>
   );
 };
-

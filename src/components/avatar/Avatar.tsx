@@ -14,7 +14,7 @@ export interface AvatarProps {
 const sizeMapping = {
   small: 30,
   medium: 40,
-  large: 50,
+  large: 90,
 };
 
 export const Avatar = ({

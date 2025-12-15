@@ -12,7 +12,7 @@ export const CreatePostPage = () => {
   return (
     <PageWrapper>
       <div className={styles.container}>
-        <Toolbar className={styles.toolbar}>
+        <Toolbar>
           <IconButton
             edge="start"
             color="inherit"

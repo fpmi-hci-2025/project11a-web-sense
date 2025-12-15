@@ -39,7 +39,9 @@ export const PublicationCard = ({
         ? styles.expert
         : styles.user;
 
-  const handleClickNaviagate = () => {
+  const handleClickNaviagate = (e: React.MouseEvent) => {
+    e.stopPropagation();
+
     navigate(`/publication/${publication.id}`, {
       state: { publication },
     });
@@ -67,7 +69,11 @@ export const PublicationCard = ({
                 clickable={true}
                 onClick={() => navigate(`/profile/${publication.author?.id}`)}
               />
-              <Typography className={styles.authorName} variant="body2">
+              <Typography
+                className={styles.authorName}
+                variant="body2"
+                onClick={() => navigate(`/profile/${publication.author?.id}`)}
+              >
                 {publication.author.username}
               </Typography>
             </div>

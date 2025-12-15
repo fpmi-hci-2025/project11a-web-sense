@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import type {
   CreatePublicationData,
   Publication,
@@ -76,6 +76,54 @@ const mapPublicationResponseToPublication = (
       }
     : { id: '', username: '', iconUrl: '', role: 'User' },
 });
+
+const enrichCommentWithAuthor = async (comment: Comment): Promise<Comment> => {
+  if (comment.author) {
+    if (comment.author.iconUrl && !comment.author.iconUrl.startsWith('http')) {
+      try {
+        const mediaResponse = await request(
+          `/media/${comment.author.iconUrl}/file`,
+          { method: 'GET' },
+        );
+        return {
+          ...comment,
+          author: {
+            ...comment.author,
+            iconUrl: mediaResponse.url,
+          },
+        };
+      } catch (error) {
+        console.error(
+          `Failed to fetch avatar for comment author ${comment.authorId}`,
+          error,
+        );
+        return comment;
+      }
+    }
+    return comment;
+  }
+
+  try {
+    const authorData = await fetchAuthorData(comment.authorId);
+    return {
+      ...comment,
+      author: authorData,
+    };
+  } catch (error) {
+    console.error(
+      `Failed to fetch author data for comment ${comment.id}`,
+      error,
+    );
+    return comment;
+  }
+};
+
+const enrichCommentsWithAuthors = async (
+  comments: Comment[],
+): Promise<Comment[]> => {
+  if (!comments || comments.length === 0) return [];
+  return await Promise.all(comments.map(enrichCommentWithAuthor));
+};
 
 const mapComments = (response: CommentsResponse): Comment[] => {
   return response.items.map((item) => ({
@@ -177,7 +225,7 @@ export const usePublication = () => {
     });
   };
 
-  const createPublication = async (data: CreatePublicationData) => {
+  const createPublication = useCallback(async (data: CreatePublicationData) => {
     setLoading(true);
     setError(false);
 
@@ -210,9 +258,9 @@ export const usePublication = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const getPublication = async (id: string) => {
+  const getPublication = useCallback(async (id: string) => {
     setLoading(true);
     setError(false);
     try {
@@ -227,29 +275,29 @@ export const usePublication = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const updatePublication = async (
-    id: string,
-    data: { title: string; content: string },
-  ) => {
-    setLoading(true);
-    setError(false);
-    try {
-      const response: FeedItem = await request(`/publication/${id}`, {
-        method: 'PUT',
-        body: JSON.stringify(data),
-      });
-      return await enrichPublication(response);
-    } catch (err) {
-      setError(true);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  };
+  const updatePublication = useCallback(
+    async (id: string, data: { title: string; content: string }) => {
+      setLoading(true);
+      setError(false);
+      try {
+        const response: FeedItem = await request(`/publication/${id}`, {
+          method: 'PUT',
+          body: JSON.stringify(data),
+        });
+        return await enrichPublication(response);
+      } catch (err) {
+        setError(true);
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [],
+  );
 
-  const deletePublication = async (id: string) => {
+  const deletePublication = useCallback(async (id: string) => {
     setLoading(true);
     setError(false);
     try {
@@ -262,27 +310,27 @@ export const usePublication = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const likePublication = async (id: string) => {
+  const likePublication = useCallback(async (id: string) => {
     await request(`/publication/${id}/like`, {
       method: 'POST',
     });
-  };
+  }, []);
 
-  const getLikes = async (id: string) => {
+  const getLikes = useCallback(async (id: string) => {
     await request(`/publication/${id}/likes`, {
       method: 'GET',
     });
-  };
+  }, []);
 
-  const savePublication = async (id: string) => {
+  const savePublication = useCallback(async (id: string) => {
     await request(`/publication/${id}/save`, {
       method: 'POST',
     });
-  };
+  }, []);
 
-  const getComments = async (id: string) => {
+  const getComments = useCallback(async (id: string) => {
     setLoading(true);
     setError(false);
 
@@ -296,33 +344,59 @@ export const usePublication = () => {
 
       if (response.items === null) return null;
 
-      return mapComments(response);
+      const comments = mapComments(response);
+      return await enrichCommentsWithAuthors(comments);
     } catch (err) {
       setError(true);
       throw err;
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const createComment = async (id: string, content: string) => {
+  const createComment = useCallback(async (id: string, content: string) => {
     setLoading(true);
     setError(false);
 
     try {
-      const comment = await request(`/publication/${id}/comments`, {
+      const commentResponse = await request(`/publication/${id}/comments`, {
         method: 'POST',
         body: JSON.stringify({ content }),
       });
 
-      return comment;
+      const comment: Comment = {
+        id: commentResponse.id,
+        publicationId: commentResponse.publication_id,
+        parentId: commentResponse.parent_id || null,
+        authorId: commentResponse.author_id,
+        text: commentResponse.text,
+        createdAt: commentResponse.created_at,
+        likesCount: commentResponse.likes_count,
+        isLiked: commentResponse.is_liked,
+        author: commentResponse.author
+          ? {
+              id: commentResponse.author.id,
+              username: commentResponse.author.username,
+              email: commentResponse.author.email,
+              phone: commentResponse.author.phone,
+              iconUrl: commentResponse.author.icon_url,
+              description: commentResponse.author.description,
+              role: commentResponse.author.role as UserResponse['role'],
+              registeredAt: commentResponse.author.registered_at,
+            }
+          : undefined,
+      };
+
+      const enrichedComment = await enrichCommentWithAuthor(comment);
+      return enrichedComment;
     } catch (err) {
       setError(true);
       console.log('Error creating comment:', err);
+      throw err;
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   return {
     loading,
