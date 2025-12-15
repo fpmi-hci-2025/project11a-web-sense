@@ -93,7 +93,7 @@ const CreatePost: React.FC = () => {
 
       navigate('/profile');
     } catch {
-      console.log('Error submitting data');
+      console.error('Error submitting data');
     }
   };
 

@@ -28,7 +28,6 @@ const request = async (endpoint: string, options: RequestInit = {}) => {
 };
 
 const fetchMediaUrl = async (mediaId: string): Promise<string> => {
-  console.log('Fetching media URL for mediaId:', mediaId);
   const res = await request(`/media/${mediaId}/file`, {
     method: 'GET',
   });
@@ -114,20 +113,9 @@ export const useFeed = () => {
         const queryString = params.toString();
         const endpoint = queryString ? `/feed?${queryString}` : '/feed';
 
-        console.log('getFeed request:', { endpoint, limit, offset });
         const feedResponse = await request(endpoint, { method: 'GET' });
-        console.log('getFeed response:', {
-          itemsCount: feedResponse.items?.length || 0,
-          total: feedResponse.total,
-          limit,
-          offset,
-        });
 
         const enrichedFeed = await enrichFeed(feedResponse);
-        console.log('getFeed enriched:', {
-          itemsCount: enrichedFeed.items?.length || 0,
-          total: enrichedFeed.total,
-        });
 
         return enrichedFeed;
       } catch (err) {
