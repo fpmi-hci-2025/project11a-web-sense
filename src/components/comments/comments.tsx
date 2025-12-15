@@ -62,9 +62,6 @@ export const Comments = ({ commentsResponse, loading }: CommentsProps) => {
               <Typography variant="body1" sx={{ mb: 1 }}>
                 {comment.text}
               </Typography>
-              <Typography variant="caption" color="text.secondary">
-                {comment.likesCount} likes
-              </Typography>
             </Box>
           </Box>
         </Paper>

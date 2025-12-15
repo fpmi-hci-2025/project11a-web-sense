@@ -37,7 +37,6 @@ const mapProfileResponseToProfile = (res: UserResponse): Profile => ({
 });
 
 const fetchAvatarUrl = async (avatarId: string): Promise<string> => {
-  console.log('Fetching avatar URL for avatarId:', avatarId);
   try {
     const res = await request(`/media/${avatarId}/file`, {
       method: 'GET',

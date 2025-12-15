@@ -152,7 +152,6 @@ const mapComments = (response: CommentsResponse): Comment[] => {
 };
 
 const fetchMediaUrl = async (mediaId: string): Promise<string> => {
-  console.log('Fetching media URL for mediaId:', mediaId);
   const res = await request(`/media/${mediaId}/file`, {
     method: 'GET',
   });
@@ -168,12 +167,10 @@ const fetchAuthorData = async (userId: string) => {
 const enrichPublication = async (
   publication: FeedItem,
 ): Promise<Publication> => {
-  console.log('Enriching publication:', publication.id);
   const parsedPublication = mapPublicationResponseToPublication(publication);
 
   if (parsedPublication.authorId) {
     try {
-      console.log('Fetching author data for:', parsedPublication.authorId);
       const authorData = await fetchAuthorData(parsedPublication.authorId);
       parsedPublication.author = authorData;
     } catch (error) {
@@ -186,7 +183,6 @@ const enrichPublication = async (
 
   if (publication.media && publication.media[0]) {
     try {
-      console.log('Enriching media for publication:', publication.id);
       const mediaUrl = await fetchMediaUrl(publication.media[0].id);
       return {
         ...parsedPublication,
@@ -205,6 +201,7 @@ const enrichPublication = async (
 
 export const usePublication = () => {
   const [loading, setLoading] = useState(false);
+  const [commentLoading, setCommentLoading] = useState(false);
   const [error, setError] = useState(false);
 
   const uploadMedia = async (file: File) => {
@@ -331,7 +328,7 @@ export const usePublication = () => {
   }, []);
 
   const getComments = useCallback(async (id: string) => {
-    setLoading(true);
+    setCommentLoading(true);
     setError(false);
 
     try {
@@ -350,18 +347,18 @@ export const usePublication = () => {
       setError(true);
       throw err;
     } finally {
-      setLoading(false);
+      setCommentLoading(false);
     }
   }, []);
 
-  const createComment = useCallback(async (id: string, content: string) => {
-    setLoading(true);
+  const createComment = useCallback(async (id: string, text: string) => {
+    setCommentLoading(true);
     setError(false);
 
     try {
       const commentResponse = await request(`/publication/${id}/comments`, {
         method: 'POST',
-        body: JSON.stringify({ content }),
+        body: JSON.stringify({ text }),
       });
 
       const comment: Comment = {
@@ -391,15 +388,15 @@ export const usePublication = () => {
       return enrichedComment;
     } catch (err) {
       setError(true);
-      console.log('Error creating comment:', err);
       throw err;
     } finally {
-      setLoading(false);
+      setCommentLoading(false);
     }
   }, []);
 
   return {
     loading,
+    commentLoading,
     error,
     createPublication,
     getPublication,

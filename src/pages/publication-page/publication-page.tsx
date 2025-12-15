@@ -9,6 +9,7 @@ import {
   IconButton,
   Toolbar,
   CircularProgress,
+  Alert,
 } from '@mui/material';
 import { ArrowBack as ArrowBackIcon } from '@mui/icons-material';
 import { usePublication } from '../../api/publication/usePublication';
@@ -28,12 +29,15 @@ export const PublicationPage = () => {
   const {
     getPublication,
     getComments,
+    createComment,
     loading: publicationLoading,
+    commentLoading,
   } = usePublication();
   const [publication, setPublication] = useState<Publication | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState('');
-  const [error, setError] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [commentError, setCommentError] = useState<string | null>(null);
   const lastFetchedIdRef = useRef<string | null>(null);
 
   useEffect(() => {
@@ -43,7 +47,7 @@ export const PublicationPage = () => {
       if (lastFetchedIdRef.current !== id) {
         setPublication(null);
         setComments([]);
-        setError(false);
+        setError(null);
         lastFetchedIdRef.current = null;
       }
 
@@ -67,10 +71,9 @@ export const PublicationPage = () => {
         setPublication(publicationData);
 
         const commentsData = await getComments(id);
-
-        if (commentsData) setComments(commentsData);
+        setComments(commentsData || []);
       } catch (err) {
-        setError(true);
+        setError('Failed to load publication');
         throw err;
       }
     };
@@ -78,17 +81,19 @@ export const PublicationPage = () => {
     fetchPublication();
   }, [id, getComments, getPublication, location.state, publication]);
 
-  // const handleCreateComment = async () => {
-  //   if (!id || !newComment.trim()) return;
+  const handleCreateComment = async () => {
+    if (!id || !newComment.trim() || commentLoading) return;
 
-  //   try {
-  //     const comment = await createComment(id, newComment.trim());
-  //     setComments(prev => [...prev, comment]);
-  //     setNewComment('');
-  //   } catch (err: any) {
-  //     setError(err.message || 'Failed to create comment');
-  //   }
-  // };
+    setCommentError(null);
+
+    try {
+      const comment = await createComment(id, newComment.trim());
+      setComments((prev) => [...prev, comment]);
+      setNewComment('');
+    } catch {
+      setCommentError('Failed to create comment');
+    }
+  };
 
   if (error) {
     return (
@@ -162,13 +167,23 @@ export const PublicationPage = () => {
                   value={newComment}
                   onChange={(e) => setNewComment(e.target.value)}
                   sx={{ mb: 2 }}
+                  disabled={commentLoading}
+                  error={!!commentError}
+                  helperText={commentError}
                 />
                 <Button
-                  label={publicationLoading ? 'Posting...' : 'Post Comment'}
+                  label={commentLoading ? 'Posting...' : 'Post Comment'}
+                  onClick={handleCreateComment}
+                  disabled={!newComment.trim() || commentLoading}
                 />
               </Paper>
 
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                {commentError && (
+                  <Alert severity="error" sx={{ mb: 2 }}>
+                    {commentError}
+                  </Alert>
+                )}
                 {comments.length === 0 ? (
                   <Typography
                     variant="body2"
@@ -180,7 +195,7 @@ export const PublicationPage = () => {
                 ) : (
                   <Comments
                     commentsResponse={comments}
-                    loading={publicationLoading}
+                    loading={false} // Only show loading for initial publication load, not comment submission
                   />
                 )}
               </Box>
