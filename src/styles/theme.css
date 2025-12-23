@@ -18,8 +18,11 @@
   --sense-expert-gradient: #FFDA5B50;
   --sense-user-color: #81CFF4;
   --sense-user-gradient: #81CFF450;
+  --sense-color: #fff;
   --sense-button-text-color: #F5F5F5;
   --sense-button-bg-color: #262626;
+  --sense-button-footer-bg-color: #262626;
+  --sense-button-footer-text-color: #f5f5f5;
   --sense-text-button-color: #262626;
   --sense-shadow-color: rgba(0, 0, 0, 0.1);
   --sense-gradient-color: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 100%);
@@ -100,7 +103,10 @@
   --sense-expert-gradient: #FFE38250;
   --sense-user-color: #95DDFF;
   --sense-user-gradient: #95DDFF50;
+  --sense-color: #262626;
   --sense-button-text-color: #262626;
+  --sense-button-footer-bg-color: #262626;
+  --sense-button-footer-text-color: #f5f5f5;
   --sense-button-bg-color: #F5F5F5;
   --sense-text-button-color: #f5f5f5;
   --sense-shadow-color: rgba(0, 0, 0, 0.3);

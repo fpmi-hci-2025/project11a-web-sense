@@ -3,8 +3,10 @@ import { RegisterPage } from '../pages/register-page';
 import { PublicationPage } from '../pages/publication-page';
 import { CreatePostPage } from '../pages/create-post-pages/create-post-page';
 import { AboutPage } from '../pages/about-page';
+import SearchPage from '../pages/search-page/search-page';
 import { TeamPage } from '../pages/team-page/team-page';
 import { ProfilePage } from '../pages/profile-page';
+import { SettingsPage } from '../pages/settings-page/settings-page';
 
 export const routes = [
   {
@@ -58,7 +60,16 @@ export const routes = [
   {
     path: '/create-post',
     element: <CreatePostPage />,
-    // protected: true,
+    protected: true,
     name: 'Create Post',
+  },
+  {
+    path: '/settings',
+    element: <SettingsPage />,
+  },
+  {
+    path: '/search',
+    element: <SearchPage />,
+    name: 'Search',
   },
 ];

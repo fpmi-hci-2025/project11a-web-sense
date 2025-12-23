@@ -20,7 +20,7 @@ const AiButton: React.FC = () => {
       size="large"
       aria-label="ai"
     >
-      <Bolt />
+      <Bolt className={styles.icon} />
     </IconButton>
   );
 };

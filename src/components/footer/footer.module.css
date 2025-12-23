@@ -2,8 +2,8 @@
 
 .footer {
   width: 100%;
-  background-color: var(--sense-button-bg-color);
-  color: var(--sense-button-text-color);
+  background-color: var(--sense-button-footer-bg-color);
+  color: var(--sense-button-footer-text-color);
   padding: 2rem 0;
   display: flex;
   flex-direction: column;

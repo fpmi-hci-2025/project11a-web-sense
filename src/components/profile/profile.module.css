@@ -5,6 +5,7 @@
   width: 100%;
   margin-bottom: 24px;
   max-width: 800px;
+  background-color: var(--sense-color) !important;
 }
 
 .profileContent {
@@ -15,6 +16,7 @@
 
 .userInfo {
   flex: 1;
+  color: var(--sense-button-bg-color);
 }
 
 .bio {

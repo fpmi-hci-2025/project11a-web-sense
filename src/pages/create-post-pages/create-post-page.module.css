@@ -15,3 +15,7 @@
   min-height: 400px;
   gap: 16px;
 }
+
+.icon {
+    color: var(--sense-button-bg-color) !important;
+}

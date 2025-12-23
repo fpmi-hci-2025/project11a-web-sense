@@ -177,7 +177,7 @@ export const ProfilePage = () => {
             onClick={() => navigate(-1)}
             sx={{ mr: 2 }}
           >
-            <ArrowBackIcon />
+            <ArrowBackIcon className={styles.icon} />
           </IconButton>
 
           {isCurrentUser && (
@@ -186,10 +186,7 @@ export const ProfilePage = () => {
                 label="Create post"
                 onClick={() => navigate('/create-post')}
               />
-              <Button
-                label="Edit profile"
-                onClick={() => navigate('/settings')}
-              />
+              <Button label="Settings" onClick={() => navigate('/settings')} />
             </Box>
           )}
         </Box>
@@ -256,6 +253,7 @@ export const ProfilePage = () => {
 
               {!hasMore && publications.length > 0 && (
                 <Box
+                  className={styles.text}
                   sx={{ textAlign: 'center', py: 4, color: 'text.secondary' }}
                 >
                   You've reached the end

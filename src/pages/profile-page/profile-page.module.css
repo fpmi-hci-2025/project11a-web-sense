@@ -11,3 +11,7 @@
     align-items: center;
     justify-items: center !important;
 }
+
+.icon, .text {
+    color: var(--sense-button-bg-color) !important;
+}

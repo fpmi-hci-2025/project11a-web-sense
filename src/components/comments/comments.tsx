@@ -3,6 +3,8 @@ import { Avatar } from '../../components/avatar';
 import { UserBadge } from '../../components/user-badge';
 import { type Comment } from '../../api/publication/types';
 
+import styles from './comments.module.css';
+
 interface CommentsProps {
   commentsResponse: Comment[];
   loading?: boolean;
@@ -22,8 +24,8 @@ export const Comments = ({ commentsResponse, loading }: CommentsProps) => {
   if (!comments || comments.length === 0) {
     return (
       <Typography
+        className={styles.text}
         variant="body2"
-        color="text.secondary"
         sx={{ textAlign: 'center', py: 4 }}
       >
         No comments yet. Be the first to comment!
@@ -34,7 +36,12 @@ export const Comments = ({ commentsResponse, loading }: CommentsProps) => {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
       {comments.map((comment) => (
-        <Paper key={comment.id} elevation={0} sx={{ p: 3, borderRadius: 5 }}>
+        <Paper
+          key={comment.id}
+          elevation={0}
+          sx={{ p: 3, borderRadius: 5 }}
+          className={styles.card}
+        >
           <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
             <Avatar
               src={comment.author?.iconUrl || ''}
@@ -51,15 +58,27 @@ export const Comments = ({ commentsResponse, loading }: CommentsProps) => {
                   mb: 1,
                 }}
               >
-                <Typography variant="subtitle2" fontWeight="700">
+                <Typography
+                  className={styles.text}
+                  variant="subtitle2"
+                  fontWeight="700"
+                >
                   {comment.author?.username}
                 </Typography>
                 <UserBadge role={comment.author?.role || 'User'} />
-                <Typography variant="caption" color="text.secondary">
+                <Typography
+                  className={styles.text}
+                  variant="caption"
+                  color="text.secondary"
+                >
                   {new Date(comment.createdAt).toLocaleDateString()}
                 </Typography>
               </Box>
-              <Typography variant="body1" sx={{ mb: 1 }}>
+              <Typography
+                className={styles.text}
+                variant="body1"
+                sx={{ mb: 1 }}
+              >
                 {comment.text}
               </Typography>
             </Box>
