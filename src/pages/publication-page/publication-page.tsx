@@ -128,7 +128,7 @@ export const PublicationPage = () => {
             onClick={() => navigate(-1)}
             sx={{ mr: 2 }}
           >
-            <ArrowBackIcon />
+            <ArrowBackIcon className={styles.icon} />
           </IconButton>
         </Toolbar>
 
@@ -151,15 +151,24 @@ export const PublicationPage = () => {
             />
 
             <Box sx={{ maxWidth: '600px', mx: 'auto', width: '100%' }}>
-              <Typography variant="h5" sx={{ mb: 4, fontWeight: '700' }}>
+              <Typography
+                className={styles.text}
+                variant="h5"
+                sx={{ mb: 4, fontWeight: '700' }}
+              >
                 Comments ({comments.length})
               </Typography>
 
-              <Paper elevation={0} sx={{ p: 3, mb: 3, borderRadius: 5 }}>
-                <Typography variant="h6" sx={{ mb: 2 }}>
+              <Paper
+                className={styles.card}
+                elevation={0}
+                sx={{ p: 3, mb: 3, borderRadius: 5 }}
+              >
+                <Typography className={styles.text} variant="h6" sx={{ mb: 2 }}>
                   Add a comment
                 </Typography>
                 <TextField
+                  className={styles.textField}
                   fullWidth
                   multiline
                   rows={3}
@@ -186,6 +195,7 @@ export const PublicationPage = () => {
                 )}
                 {comments.length === 0 ? (
                   <Typography
+                    className={styles.text}
                     variant="body2"
                     color="text.secondary"
                     sx={{ textAlign: 'center', py: 4 }}
@@ -193,10 +203,7 @@ export const PublicationPage = () => {
                     No comments yet. Be the first to comment!
                   </Typography>
                 ) : (
-                  <Comments
-                    commentsResponse={comments}
-                    loading={false} // Only show loading for initial publication load, not comment submission
-                  />
+                  <Comments commentsResponse={comments} loading={false} />
                 )}
               </Box>
             </Box>

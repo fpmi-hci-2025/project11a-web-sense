@@ -4,6 +4,8 @@ import styles from './header.module.css';
 import { Logo } from '../logo';
 import clsx from 'clsx';
 import { Button } from '../button';
+import IconButton from '@mui/material/IconButton';
+import SearchIcon from '@mui/icons-material/Search';
 
 export interface HeaderProps {
   avatarSrc?: string;
@@ -54,6 +56,10 @@ export const Header = ({
     }
   };
 
+  const handleSearchClick = () => {
+    navigate('/search');
+  };
+
   return (
     <header className={clsx(styles['sense-header'], className)}>
       <div className={styles['sense-header-container']}>
@@ -61,6 +67,13 @@ export const Header = ({
           <Logo size={logoSize} onClick={handleLogoClick} clickable={true} />
         )}
         <div className={styles['sense-header-actions']}>
+          <IconButton
+            aria-label="search"
+            onClick={handleSearchClick}
+            size="large"
+          >
+            <SearchIcon className={styles.icon} />
+          </IconButton>
           {showLoginButton && (
             <Button label="Login" variant="filled" onClick={handleLoginClick} />
           )}

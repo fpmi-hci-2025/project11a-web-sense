@@ -13,13 +13,8 @@ export const CreatePostPage = () => {
     <PageWrapper>
       <div className={styles.container}>
         <Toolbar>
-          <IconButton
-            edge="start"
-            color="inherit"
-            onClick={() => navigate(-1)}
-            sx={{ mr: 2 }}
-          >
-            <ArrowBackIcon />
+          <IconButton edge="start" onClick={() => navigate(-1)} sx={{ mr: 2 }}>
+            <ArrowBackIcon className={styles.icon} />
           </IconButton>
         </Toolbar>
 

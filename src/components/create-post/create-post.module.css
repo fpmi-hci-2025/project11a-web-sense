@@ -38,7 +38,8 @@
 }
 
 .textField {
-  background-color: var(--mui-background-default);
+  background-color: var(--sense-button-text-color);
+  color: var(--sense-button-bg-color);
   width: 100%;
 }
 

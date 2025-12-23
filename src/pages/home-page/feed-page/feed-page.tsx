@@ -9,6 +9,14 @@ import { CircularProgress, Box } from '@mui/material';
 const PAGE_SIZE = 10;
 const SCROLL_THRESHOLD = 200;
 
+const shuffleArray = (array: Publication[]) => {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+};
+
 export const FeedPage = () => {
   const { getFeed, loading } = useFeed();
   const navigate = useNavigate();
@@ -25,7 +33,7 @@ export const FeedPage = () => {
     const loadInitialFeed = async () => {
       try {
         const feed = await getFeed(PAGE_SIZE, 0);
-        setPublications(feed.items);
+        setPublications(shuffleArray(feed.items));
         setHasMore(feed.items.length === PAGE_SIZE);
         setOffset(PAGE_SIZE);
       } catch (err) {
@@ -47,7 +55,7 @@ export const FeedPage = () => {
       const feed = await getFeed(PAGE_SIZE, offset);
 
       if (feed.items.length > 0) {
-        setPublications((prev) => [...prev, ...feed.items]);
+        setPublications((prev) => shuffleArray([...prev, ...feed.items]));
         setOffset((prev) => prev + PAGE_SIZE);
         setHasMore(feed.items.length === PAGE_SIZE);
       } else {
@@ -118,7 +126,10 @@ export const FeedPage = () => {
             )}
 
             {!hasMore && (
-              <Box sx={{ textAlign: 'center', py: 4, color: 'text.secondary' }}>
+              <Box
+                className={styles.footerText}
+                sx={{ textAlign: 'center', py: 4 }}
+              >
                 You've reached the end of the feed
               </Box>
             )}

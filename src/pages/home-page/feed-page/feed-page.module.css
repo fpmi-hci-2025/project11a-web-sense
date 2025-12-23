@@ -42,3 +42,6 @@
   font-size: 18px;
 }
 
+.footerText {
+  color: var(--sense-button-bg-color) !important;
+}

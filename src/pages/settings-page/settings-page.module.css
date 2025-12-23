@@ -1,0 +1,7 @@
+.icon {
+    color: var(--sense-button-bg-color) !important;
+}
+
+.text {
+  color: var(--sense-text-button-color) !important;
+}

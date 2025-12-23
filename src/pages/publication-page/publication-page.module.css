@@ -103,3 +103,19 @@
   font-size: 18px;
   color: #d32f2f;
 }
+
+.text {
+  color: var(--sense-text-button-color) !important;
+}
+
+.card {
+  background-color: var(--sense-button-text-color) !important;
+}
+
+.textField {
+  color: var(--sense-text-button-color) !important;
+}
+
+.icon {
+    color: var(--sense-button-bg-color) !important;
+}

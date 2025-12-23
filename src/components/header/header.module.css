@@ -50,3 +50,7 @@
     font-size: 48px;
   }
 }
+
+.icon {
+    color: var(--sense-button-bg-color) !important;
+}
