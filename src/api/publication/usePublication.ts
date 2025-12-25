@@ -5,7 +5,7 @@ import type {
   Comment,
   CommentsResponse,
 } from './types';
-import type { Role, UserResponse } from '../auth/types';
+import type { UserResponse } from '../auth/types';
 import { API_BASE_URL } from '../constants';
 import type { FeedItem } from '../feed/types';
 import { mapUserResponse } from '../auth/useAuth';
@@ -39,14 +39,15 @@ const request = async (endpoint: string, options: RequestInit = {}) => {
   return res.json();
 };
 
-const getRole = (role: Role) => {
+const getRole = (role: string) => {
   switch (role) {
     case 'creator':
       return 'Creator';
-    case 'user':
-      return 'User';
     case 'expert':
       return 'Expert';
+    case 'user':
+    case 'reader':
+    case 'super':
     default:
       return 'User';
   }
@@ -223,6 +224,7 @@ export const usePublication = () => {
   };
 
   const createPublication = useCallback(async (data: CreatePublicationData) => {
+    console.log('Creating publication with data:', data);
     setLoading(true);
     setError(false);
 
@@ -235,7 +237,7 @@ export const usePublication = () => {
 
       const payload = {
         type: data.type,
-        title: data.title,
+        title: data.type !== 'article' ? 'title' : data.title,
         content: data.content,
         description: data.description,
         source: data.source,

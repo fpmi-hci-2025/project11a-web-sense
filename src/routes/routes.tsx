@@ -66,10 +66,13 @@ export const routes = [
   {
     path: '/settings',
     element: <SettingsPage />,
+    protected: true,
+    name: 'Settings',
   },
   {
     path: '/search',
     element: <SearchPage />,
+    protected: true,
     name: 'Search',
   },
 ];

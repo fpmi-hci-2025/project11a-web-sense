@@ -1,5 +1,16 @@
-import { useState, useEffect, useContext, createContext, type ReactNode } from 'react';
-import type { AuthContextType, AuthResponse, User, UserResponse } from './types';
+import {
+  useState,
+  useEffect,
+  useContext,
+  createContext,
+  type ReactNode,
+} from 'react';
+import type {
+  AuthContextType,
+  AuthResponse,
+  User,
+  UserResponse,
+} from './types';
 import { API_BASE_URL } from '../constants';
 const LOGIN_ENDPOINT = '/auth/login';
 const REGISTER_ENDPOINT = '/auth/register';
@@ -9,21 +20,28 @@ const LOGOUT_ENDPOINT = '/auth/logout';
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const getAuthToken = (): string | null => localStorage.getItem('authToken');
-const setAuthToken = (token: string): void => localStorage.setItem('authToken', token);
+const setAuthToken = (token: string): void =>
+  localStorage.setItem('authToken', token);
 const clearAuthToken = (): void => localStorage.removeItem('authToken');
 
 export const mapUserResponse = (response: UserResponse): User => {
+  let mappedRole: 'user' | 'expert' | 'creator';
+  if (response.role === 'expert' || response.role === 'creator') {
+    mappedRole = response.role;
+  } else {
+    mappedRole = 'user';
+  }
   return {
     id: response.id,
     username: response.username,
-    role: response.role,
+    role: mappedRole,
     registeredAt: response.registered_at,
     email: response.email,
     phone: response.phone,
     iconUrl: response.icon_url,
     description: response.description,
-  }
-}
+  };
+};
 
 const apiLogin = async (login: string, password: string): Promise<User> => {
   const res = await fetch(`${API_BASE_URL}${LOGIN_ENDPOINT}`, {
@@ -43,7 +61,11 @@ const apiLogin = async (login: string, password: string): Promise<User> => {
   return mapUserResponse(data.user);
 };
 
-const apiRegister = async (username: string, email: string, password: string): Promise<User> => {
+const apiRegister = async (
+  username: string,
+  email: string,
+  password: string,
+): Promise<User> => {
   setTimeout(() => {}, 2000);
   const res = await fetch(`${API_BASE_URL}${REGISTER_ENDPOINT}`, {
     method: 'POST',
@@ -111,7 +133,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const register = async (username: string, email: string, password: string) => {
+  const register = async (
+    username: string,
+    email: string,
+    password: string,
+  ) => {
     setLoading(true);
     try {
       const user = await apiRegister(username, email, password);
@@ -149,7 +175,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, check, logout }}>
+    <AuthContext.Provider
+      value={{ user, loading, login, register, check, logout }}
+    >
       {children}
     </AuthContext.Provider>
   );

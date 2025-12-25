@@ -109,7 +109,7 @@
 }
 
 .card {
-  background-color: var(--sense-button-text-color) !important;
+  background-color: var(--sense-color) !important;
 }
 
 .textField {
