@@ -5,6 +5,8 @@ import styles from './create-post.module.css';
 import { Button } from '../button';
 import ImageUpload from '../image-upload';
 import AiButton from '../ai-button/ai-button';
+import { AiPromptModal } from '../ai-button/AiPromptModal';
+import { useAi } from '../../api/ai/useAi';
 import { useAuth } from '../../api/auth/useAuth';
 import { usePublication } from '../../api/publication/usePublication';
 
@@ -19,6 +21,27 @@ const CreatePost: React.FC = () => {
     source: '',
   });
   const [formError, setFormError] = useState<string | null>(null);
+  const [aiModalOpen, setAiModalOpen] = useState(false);
+  const { generateText, loading: aiLoading } = useAi();
+  const handleAiButtonClick = () => {
+    setAiModalOpen(true);
+  };
+
+  const handleAiModalClose = () => {
+    setAiModalOpen(false);
+  };
+
+  const handleAiPromptSubmit = async (
+    prompt: string,
+    onResult?: (result: string) => void,
+  ) => {
+    const result = await generateText(prompt);
+    if (result) {
+      setFormData((prev) => ({ ...prev, content: result }));
+      if (onResult) onResult(result);
+    }
+    setAiModalOpen(false);
+  };
 
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -150,8 +173,23 @@ const CreatePost: React.FC = () => {
               disabled={loading}
             />
             <Box sx={{ position: 'absolute', bottom: 16, right: 16 }}>
-              <AiButton />
+              <span onClick={handleAiButtonClick}>
+                <AiButton loading={aiLoading} />
+              </span>
             </Box>
+            <AiPromptModal
+              open={aiModalOpen}
+              onClose={handleAiModalClose}
+              onResult={(result) =>
+                setFormData((prev) => ({ ...prev, content: result }))
+              }
+              loading={aiLoading}
+              onSubmit={(prompt) =>
+                handleAiPromptSubmit(prompt, (result) =>
+                  setFormData((prev) => ({ ...prev, content: result })),
+                )
+              }
+            />
           </Box>
 
           <Button
