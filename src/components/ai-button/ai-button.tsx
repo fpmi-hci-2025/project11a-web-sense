@@ -1,10 +1,14 @@
 import React from 'react';
-import { IconButton } from '@mui/material';
+import { IconButton, CircularProgress } from '@mui/material';
 import { Bolt } from '@mui/icons-material';
 import styles from './ai-button.module.css';
 import { useAuth } from '../../api/auth/useAuth';
 
-const AiButton: React.FC = () => {
+interface AiButtonProps {
+  loading?: boolean;
+}
+
+const AiButton: React.FC<AiButtonProps> = ({ loading = false }) => {
   const { user } = useAuth();
 
   const roleClass =
@@ -19,8 +23,13 @@ const AiButton: React.FC = () => {
       className={`${styles['ai-button']} ${roleClass}`}
       size="large"
       aria-label="ai"
+      disabled={loading}
     >
-      <Bolt className={styles.icon} />
+      {loading ? (
+        <CircularProgress size={24} />
+      ) : (
+        <Bolt className={styles.icon} />
+      )}
     </IconButton>
   );
 };

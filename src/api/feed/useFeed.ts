@@ -56,6 +56,16 @@ const parsePublication = (response: FeedItem): Publication => ({
   author: response.author ? mapUserResponse(response.author) : undefined,
 });
 
+const POST_IMAGES = [
+  'https://images.unsplash.com/photo-1593696954577-ab3d39317b97?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fGZyZWUlMjBpbWFnZXN8ZW58MHx8MHx8fDA%3D',
+  'https://images.pexels.com/photos/26056152/pexels-photo-26056152.jpeg?cs=srgb&dl=pexels-ds-babariya-756428940-26056152.jpg&fm=jpg',
+];
+
+function getRandomPostImage() {
+  const idx = Math.floor(Math.random() * POST_IMAGES.length);
+  return POST_IMAGES[idx];
+}
+
 const enrichFeedItem = async (publication: FeedItem) => {
   const parsedPublication = parsePublication(publication);
 
@@ -84,6 +94,14 @@ const enrichFeedItem = async (publication: FeedItem) => {
         error,
       );
     }
+  }
+
+  // If type is 'post' and no media, assign a random image
+  if (parsedPublication.type === 'post' && !parsedPublication.media) {
+    return {
+      ...parsedPublication,
+      media: { url: getRandomPostImage() },
+    };
   }
 
   return parsedPublication;
