@@ -13,10 +13,13 @@ export const PageWrapper = ({ children }: PageWrapperProps) => {
 
   return (
     <div>
-      <Header showLogo={true} showAvatar={!!user} showLoginButton={!user} />
-      <div className={styles.content}>
-        { children }
-      </div>
+      <Header
+        showLogo={true}
+        showAvatar={!!user}
+        showLoginButton={!user}
+        showSearch={!!user}
+      />
+      <div className={styles.content}>{children}</div>
       <Footer />
     </div>
   );

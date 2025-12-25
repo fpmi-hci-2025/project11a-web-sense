@@ -19,6 +19,7 @@ export interface HeaderProps {
   showAvatar?: boolean;
   showLoginButton?: boolean;
   showLogo?: boolean;
+  showSearch?: boolean;
 }
 
 export const Header = ({
@@ -28,6 +29,7 @@ export const Header = ({
   onAvatarClick,
   onLogoClick,
   className = '',
+  showSearch = true,
   showAvatar = true,
   showLogo = true,
   showLoginButton = true,
@@ -67,13 +69,15 @@ export const Header = ({
           <Logo size={logoSize} onClick={handleLogoClick} clickable={true} />
         )}
         <div className={styles['sense-header-actions']}>
-          <IconButton
-            aria-label="search"
-            onClick={handleSearchClick}
-            size="large"
-          >
-            <SearchIcon className={styles.icon} />
-          </IconButton>
+          {showSearch && (
+            <IconButton
+              aria-label="search"
+              onClick={handleSearchClick}
+              size="large"
+            >
+              <SearchIcon className={styles.icon} />
+            </IconButton>
+          )}
           {showLoginButton && (
             <Button label="Login" variant="filled" onClick={handleLoginClick} />
           )}

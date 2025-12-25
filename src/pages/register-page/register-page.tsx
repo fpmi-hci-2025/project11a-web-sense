@@ -100,7 +100,12 @@ export const RegisterPage = () => {
 
   return (
     <div>
-      <Header showAvatar={false} showLogo={true} showLoginButton={false} />
+      <Header
+        showAvatar={false}
+        showLogo={true}
+        showLoginButton={false}
+        showSearch={false}
+      />
       <div className={styles.container}>
         <div className={styles.formWrapper}>
           <h1 className={styles.title}>Register</h1>
