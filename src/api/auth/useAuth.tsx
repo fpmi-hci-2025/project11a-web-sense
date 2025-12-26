@@ -119,17 +119,18 @@ const apiLogout = async (): Promise<void> => {
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
 
   const login = async (email: string, password: string) => {
-    setLoading(true);
+    setIsLoadingMore(true);
     try {
       const user = await apiLogin(email, password);
       setUser(user);
     } catch (error) {
-      setLoading(false);
+      setIsLoadingMore(false);
       throw error;
     } finally {
-      setLoading(false);
+      setIsLoadingMore(false);
     }
   };
 
@@ -138,15 +139,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     email: string,
     password: string,
   ) => {
-    setLoading(true);
+    setIsLoadingMore(true);
     try {
       const user = await apiRegister(username, email, password);
       setUser(user);
     } catch (error) {
-      setLoading(false);
+      setIsLoadingMore(false);
       throw error;
     } finally {
-      setLoading(false);
+      setIsLoadingMore(false);
     }
   };
 
@@ -176,7 +177,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <AuthContext.Provider
-      value={{ user, loading, login, register, check, logout }}
+      value={{ user, loading, isLoadingMore, login, register, check, logout }}
     >
       {children}
     </AuthContext.Provider>

@@ -224,15 +224,15 @@ export const usePublication = () => {
   };
 
   const createPublication = useCallback(async (data: CreatePublicationData) => {
-    console.log('Creating publication with data:', data);
     setLoading(true);
     setError(false);
 
     try {
-      let mediaId: string | undefined;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      let media: any;
 
       if (data.type === 'post' && data.image) {
-        mediaId = await uploadMedia(data.image);
+        media = await uploadMedia(data.image);
       }
 
       const payload = {
@@ -241,7 +241,7 @@ export const usePublication = () => {
         content: data.content,
         description: data.description,
         source: data.source,
-        mediaId: data.type === 'post' ? mediaId : undefined,
+        mediaId: data.type === 'post' ? media.id : undefined,
         visibility: 'public',
       };
 

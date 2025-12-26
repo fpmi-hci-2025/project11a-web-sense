@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { TextField } from '@mui/material';
+import { TextField, Alert } from '@mui/material';
 import { Button } from '../../components/button';
 import { useAuth } from '../../api/auth/useAuth';
 import { Header } from '../../components/header';
@@ -9,7 +9,7 @@ import styles from './login-page.module.css';
 
 export const LoginPage = () => {
   const navigate = useNavigate();
-  const { login: loginUser, loading } = useAuth();
+  const { login: loginUser, isLoadingMore: loading } = useAuth();
   const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -32,12 +32,36 @@ export const LoginPage = () => {
     if (!password.trim()) {
       setPasswordError('Password is required');
       isValid = false;
-    } else if (password.length < 6) {
-      setPasswordError('Password must be at least 6 characters');
+    } else if (password.length < 8) {
+      setPasswordError('Password must be at least 8 characters');
       isValid = false;
     }
 
     return isValid;
+  };
+
+  const handleLoginChange = (value: string) => {
+    setLogin(value);
+
+    if (!value.trim()) {
+      setLoginError('Login is required');
+    } else if (value.length < 5) {
+      setLoginError('Incorrect login');
+    } else {
+      setLoginError(null);
+    }
+  };
+
+  const handlePasswordChange = (value: string) => {
+    setPassword(value);
+
+    if (!value.trim()) {
+      setPasswordError('Password is required');
+    } else if (value.length < 8) {
+      setPasswordError('Password must be at least 8 characters');
+    } else {
+      setPasswordError(null);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -73,7 +97,7 @@ export const LoginPage = () => {
               label="Login"
               type="text"
               value={login}
-              onChange={(e) => setLogin(e.target.value)}
+              onChange={(e) => handleLoginChange(e.target.value)}
               error={!!loginError}
               helperText={loginError}
               fullWidth
@@ -86,7 +110,7 @@ export const LoginPage = () => {
               label="Password"
               type="password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => handlePasswordChange(e.target.value)}
               error={!!passwordError}
               helperText={passwordError}
               fullWidth
@@ -94,7 +118,11 @@ export const LoginPage = () => {
               disabled={loading}
               autoComplete="current-password"
             />
-            {error && <div className={styles.error}>{error}</div>}
+            {error && (
+              <Alert severity="error" className={styles.alert}>
+                {error}
+              </Alert>
+            )}
             <Button
               variant="filled"
               label={loading ? 'Login...' : 'Login'}

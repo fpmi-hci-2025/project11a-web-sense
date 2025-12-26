@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { TextField } from '@mui/material';
+import { TextField, Alert } from '@mui/material';
 import { Button } from '../../components/button';
 import { useAuth } from '../../api/auth/useAuth';
 import { Header } from '../../components/header';
@@ -98,6 +98,64 @@ export const RegisterPage = () => {
     }
   };
 
+  const handleUsernameChange = (value: string) => {
+    const sanitizedValue = value
+      .toLowerCase()
+      .replace(/[^a-z0-9_]/g, '')
+      .slice(0, 20);
+    setUsername(sanitizedValue);
+
+    if (!sanitizedValue.trim()) {
+      setUsernameError('Username is required');
+    } else if (sanitizedValue.length < 5) {
+      setUsernameError('Username must be at least 5 characters');
+    } else if (sanitizedValue.length > 20) {
+      setUsernameError('Username must be at most 20 characters');
+    } else if (!validateUsername(sanitizedValue)) {
+      setUsernameError(
+        'Username must contain only lowercase letters, numbers, and underscores',
+      );
+    } else {
+      setUsernameError(null);
+    }
+  };
+
+  const handleEmailChange = (value: string) => {
+    setEmail(value);
+
+    if (!value.trim()) {
+      setEmailError('Email is required');
+    } else if (!validateEmail(value)) {
+      setEmailError('Incorrect email');
+    } else {
+      setEmailError(null);
+    }
+  };
+
+  const handlePasswordChange = (value: string) => {
+    setPassword(value);
+
+    if (!value.trim()) {
+      setPasswordError('Password is required');
+    } else if (value.length < 8) {
+      setPasswordError('Password must be at least 8 characters');
+    } else {
+      setPasswordError(null);
+    }
+  };
+
+  const handleConfirmPasswordChange = (value: string) => {
+    setConfirmPassword(value);
+
+    if (!value.trim()) {
+      setConfirmPasswordError('Confirm password is required');
+    } else if (value !== password) {
+      setConfirmPasswordError('Passwords do not match');
+    } else {
+      setConfirmPasswordError(null);
+    }
+  };
+
   return (
     <div>
       <Header
@@ -110,18 +168,17 @@ export const RegisterPage = () => {
         <div className={styles.formWrapper}>
           <h1 className={styles.title}>Register</h1>
           <form onSubmit={handleSubmit} className={styles.form}>
+            {error && (
+              <Alert severity="error" className={styles.alert}>
+                {error}
+              </Alert>
+            )}
             <TextField
               className={styles.textField}
               label="Username"
               type="text"
               value={username}
-              onChange={(e) => {
-                const value = e.target.value
-                  .toLowerCase()
-                  .replace(/[^a-z0-9_]/g, '');
-                const limitedValue = value.slice(0, 20);
-                setUsername(limitedValue);
-              }}
+              onChange={(e) => handleUsernameChange(e.target.value)}
               error={!!usernameError}
               helperText={usernameError}
               fullWidth
@@ -138,7 +195,7 @@ export const RegisterPage = () => {
               label="Email"
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => handleEmailChange(e.target.value)}
               error={!!emailError}
               helperText={emailError}
               fullWidth
@@ -151,7 +208,7 @@ export const RegisterPage = () => {
               label="Password"
               type="password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => handlePasswordChange(e.target.value)}
               error={!!passwordError}
               helperText={passwordError}
               fullWidth
@@ -164,7 +221,7 @@ export const RegisterPage = () => {
               label="Confirm password"
               type="password"
               value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
+              onChange={(e) => handleConfirmPasswordChange(e.target.value)}
               error={!!confirmPasswordError}
               helperText={confirmPasswordError}
               fullWidth
@@ -172,7 +229,6 @@ export const RegisterPage = () => {
               disabled={loading}
               autoComplete="new-password"
             />
-            {error && <div className={styles.error}>{error}</div>}
             <Button
               variant="filled"
               label={loading ? 'Register...' : 'Register'}

@@ -96,7 +96,6 @@ const enrichFeedItem = async (publication: FeedItem) => {
     }
   }
 
-  // If type is 'post' and no media, assign a random image
   if (parsedPublication.type === 'post' && !parsedPublication.media) {
     return {
       ...parsedPublication,

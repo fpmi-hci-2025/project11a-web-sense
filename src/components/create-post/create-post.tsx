@@ -204,17 +204,6 @@ const CreatePost: React.FC = () => {
         <Container sx={{ mt: 2, p: 0 }}>
           <ImageUpload onChange={handleFileChange} disabled={loading} />
 
-          <TextField
-            className={styles.textField}
-            fullWidth
-            label="Description"
-            name="content"
-            value={formData.content}
-            onChange={handleInputChange}
-            margin="normal"
-            disabled={loading}
-          />
-
           <Button
             label={loading ? 'Creating...' : 'Create'}
             disabled={loading}

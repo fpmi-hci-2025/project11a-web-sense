@@ -40,13 +40,18 @@ export type User = {
   phone?: string;
   iconUrl?: string;
   description?: string;
-}
+};
 
 export interface AuthContextType {
   user: User | null;
   loading: boolean;
+  isLoadingMore: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (username: string, email: string, password: string) => Promise<void>;
+  register: (
+    username: string,
+    email: string,
+    password: string,
+  ) => Promise<void>;
   check: () => Promise<void>;
   logout: () => Promise<void>;
 }
